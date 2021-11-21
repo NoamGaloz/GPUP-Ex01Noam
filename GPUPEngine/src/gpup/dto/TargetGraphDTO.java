@@ -1,4 +1,5 @@
-package components.targetgraph;
+package gpup.dto;
 
 public class TargetGraphDTO {
+
 }

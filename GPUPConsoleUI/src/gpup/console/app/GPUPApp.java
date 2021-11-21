@@ -1,7 +1,15 @@
 package gpup.console.app;
 
 
+import gpup.exceptions.TargetExistException;
 import gpup.system.engine.Engine;
+
+import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.NoSuchElementException;
 
 public class GPUPApp {
 
@@ -34,13 +42,24 @@ public class GPUPApp {
     }
 
     private void loadGPUPSystem() {
-        boolean fileExist = false;
-
         String path = GPUPConsoleIO.getXmlPath();
+
         try {
-            engine.buildGraphFromXml(path);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            if (!Files.probeContentType(Paths.get(path)).equals("text/xml")) {
+                System.out.println("The File you entered is not an xml file.");
+                return;
+            } else if (!Files.exists(Paths.get(path))) {
+                System.out.println("The File you try to laod is not exist.");
+                return;
+            } else {
+                engine.buildGraphFromXml(path);
+            }
+        } catch (JAXBException ex) {
+            System.out.println("The xml file you try to laod is not valid for this system, try again.");
+        } catch (FileNotFoundException ex) {
+            System.out.println("Wrong file path - the file you entered is not exist, try again.");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 

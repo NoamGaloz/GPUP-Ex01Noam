@@ -2,6 +2,8 @@ package gpup.system.engine;
 
 import gpup.components.targetgraph.TargetGraph;
 import gpup.components.task.Task;
+import gpup.dto.TargetDTO;
+import gpup.dto.TargetGraphDTO;
 import gpup.exceptions.TargetExistException;
 import gpup.jaxb.schema.generated.GPUPDescriptor;
 import gpup.jaxb.schema.parser.GPUPParser;
@@ -24,26 +26,25 @@ public class GPUPEngine implements Engine {
     public GPUPEngine() {
     }
 
-    private void loadXmlToTargetGraph(String path) {
+    private void loadXmlToTargetGraph(String path) throws FileNotFoundException, JAXBException, TargetExistException {
+        final String PACKAGE_NAME = "gpup.jaxb.schema.generated";
         GPUPDescriptor gpupDescriptor;
-        try {
+      //  try {
             InputStream inputStream = new FileInputStream(new File(path));
-            JAXBContext jc = JAXBContext.newInstance("gpup.jaxb.schema.generated");
+            JAXBContext jc = JAXBContext.newInstance(PACKAGE_NAME);
             Unmarshaller u = jc.createUnmarshaller();
             gpupDescriptor = (GPUPDescriptor) u.unmarshal(inputStream);
             targetGraph = GPUPParser.parseTargetGraph(gpupDescriptor);
-        } catch (JAXBException ex) {
-        } catch (FileNotFoundException ex) {
-            //5555555555555555555555555555555555555555555555555555555555555555555555555555
-            //5555555555555555555555555555555555555555555555555555555555555555555555555555
-            //5555555555555555555555555555555555555555555555555555555555555555555555555555
-            System.out.println(ex.getMessage());
-        } catch (TargetExistException | NoSuchElementException e) {
-            //5555555555555555555555555555555555555555555555555555555555555555555555555555
-            //5555555555555555555555555555555555555555555555555555555555555555555555555555
-            //5555555555555555555555555555555555555555555555555555555555555555555555555555
-            System.out.println(e.getMessage());
-        }
+//        } catch (JAXBException ex) {
+//
+//        } catch (FileNotFoundException ex) {
+//            throw ex;
+//        } catch (TargetExistException | NoSuchElementException e) {
+//            //5555555555555555555555555555555555555555555555555555555555555555555555555555
+//            //5555555555555555555555555555555555555555555555555555555555555555555555555555
+//            //5555555555555555555555555555555555555555555555555555555555555555555555555555
+//            System.out.println(e.getMessage());
+//        }
 
     }
 
@@ -51,7 +52,17 @@ public class GPUPEngine implements Engine {
     //C:\Users\guysh\Downloads\ex1-small.xml
 
     @Override
-    public void buildGraphFromXml(String path) {
+    public void buildGraphFromXml(String path) throws JAXBException, FileNotFoundException, TargetExistException {
         loadXmlToTargetGraph(path);
+    }
+
+    @Override
+    public TargetDTO getTargetInfo(String name) {
+        return null;
+    }
+
+    @Override
+    public TargetGraphDTO getGraphInfo() {
+        return null;
     }
 }

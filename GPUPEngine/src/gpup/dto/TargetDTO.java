@@ -1,4 +1,4 @@
-package components.target;
+package gpup.dto;
 
 import gpup.components.target.FinishResult;
 import gpup.components.target.RunResult;
