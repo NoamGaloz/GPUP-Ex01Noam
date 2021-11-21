@@ -1,6 +1,7 @@
 package gpup.console.app;
 
 
+import gpup.components.target.TargetType;
 import gpup.exceptions.TargetExistException;
 import gpup.system.engine.Engine;
 
@@ -28,6 +29,7 @@ public class GPUPApp {
                     loadGPUPSystem();
                     break;
                 case GRAPHINFO:
+                    showTargetsGraphInfo();
                     break;
                 case TARGETINFO:
                     break;
@@ -63,5 +65,20 @@ public class GPUPApp {
         }
     }
 
+
+    private void showTargetsGraphInfo() {
+
+        if(engine.IsInitialized())
+        {
+            GPUPConsoleIO.ShowTargetsNum(engine.getTotalTargetsNumber());
+            GPUPConsoleIO.ShowSpecificTargetsNum(TargetType.Independent, engine.getSpecificTypeOfTargetsNum(TargetType.Independent));
+           GPUPConsoleIO.ShowSpecificTargetsNum(TargetType.Leaf, engine.getSpecificTypeOfTargetsNum(TargetType.Leaf));
+            GPUPConsoleIO.ShowSpecificTargetsNum(TargetType.Middle, engine.getSpecificTypeOfTargetsNum(TargetType.Middle));
+            GPUPConsoleIO.ShowSpecificTargetsNum(TargetType.Root, engine.getSpecificTypeOfTargetsNum(TargetType.Root));
+        }
+        else {
+          System.out.println("Valid system not exist - please load valid xml first");
+        }
+    }
 
 }

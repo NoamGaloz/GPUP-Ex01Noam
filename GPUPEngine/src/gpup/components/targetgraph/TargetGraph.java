@@ -6,7 +6,6 @@ import gpup.components.target.Target;
 import gpup.components.target.TargetType;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -75,6 +74,19 @@ public class TargetGraph implements DirectableGraph<Target> {
 
     public String getName() {
         return name;
+    }
+
+    public int getTotalTargetsNumber() { return dependsOnGraph.count(); }
+
+    public int getSpecificTypeOfTargetsNum(TargetType targetType) {
+
+        int counter = 0;
+
+        for (Target t : dependsOnGraph.getKeySet())
+        {
+            if(t.getType()==targetType) counter++;
+        }
+         return counter;
     }
 }
 
