@@ -1,5 +1,6 @@
 package gpup.system.engine;
 
+import gpup.components.target.TargetType;
 import gpup.components.targetgraph.TargetGraph;
 import gpup.components.task.Task;
 import gpup.dto.TargetDTO;
@@ -53,5 +54,16 @@ public class GPUPEngine implements Engine {
     @Override
     public TargetGraphDTO getGraphInfo() {
         return null;
+    }
+
+    @Override
+    public boolean IsInitialized() { return targetGraph!=null; }
+
+    @Override
+    public int getTotalTargetsNumber() {return targetGraph.getTotalTargetsNumber();}
+
+    @Override
+    public int getSpecificTypeOfTargetsNum(TargetType targetType){
+        return targetGraph.getSpecificTypeOfTargetsNum(targetType);
     }
 }

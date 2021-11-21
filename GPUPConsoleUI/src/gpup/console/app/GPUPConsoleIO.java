@@ -1,5 +1,6 @@
 package gpup.console.app;
 
+import gpup.components.target.TargetType;
 import gpup.console.validation.ConsoleIOValidations;
 
 import java.util.InputMismatchException;
@@ -85,5 +86,14 @@ public class GPUPConsoleIO {
     public static void targetInfoMenu() {
         System.out.println("Please enter the target's name");
         System.out.println("   (in order to return to the main menu, press 'QP')");
+    }
+
+    public static void ShowTargetsNum(int totalTargetsNumber) {
+        System.out.println("There Are " + totalTargetsNumber + " Targets In The System.");
+    }
+
+
+    public static void ShowSpecificTargetsNum(TargetType targetType, int specificTypeOfTargetsNum) {
+        System.out.println("There Are " + specificTypeOfTargetsNum + " " + targetType.name() +" Targets In The System.");
     }
 }
