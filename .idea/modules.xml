@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/GPUP Ex01.iml" filepath="$PROJECT_DIR$/GPUP Ex01.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GPUPConsoleUI/GPUPConsoleUI.iml" filepath="$PROJECT_DIR$/GPUPConsoleUI/GPUPConsoleUI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GPUPEngine/GPUPEngine.iml" filepath="$PROJECT_DIR$/GPUPEngine/GPUPEngine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GPUPEngineDTO/GPUPEngineDTO.iml" filepath="$PROJECT_DIR$/GPUPEngineDTO/GPUPEngineDTO.iml" />
+    </modules>
+  </component>
+</project>
