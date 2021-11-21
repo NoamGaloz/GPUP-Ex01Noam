@@ -12,4 +12,8 @@ public class ConsoleIOValidations {
     }
 
 
+    public static boolean isQuit(String name) {
+        final String QUIT = "QP";
+        return name.equals(QUIT);
+    }
 }

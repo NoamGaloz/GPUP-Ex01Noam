@@ -51,25 +51,39 @@ public class GPUPConsoleIO {
     public static String getXmlPath() {
         String path;
         System.out.println("Enter the full path of the XML file you want to load:");
-        path = getPathInput(); // return a valid path, yet no promise of existing file
+        path = getStringInput("path"); // return a valid path, yet no promise of existing file
         return path;
     }
 
-    private static String getPathInput() {
+    static String getStringInput(String inputType) {
         Scanner scanner = new Scanner(System.in);
-        boolean validPath = false;
-        String path = null;
+        boolean valid = false;
+        String input = null;
         do {
             try {
-                path = scanner.nextLine();
-                validPath = true;
+                input = scanner.nextLine();
+                valid = true;
             } catch (Exception ex) {
-                System.out.println("Wrong input - this is not a valid path, try again.");
-                validPath = false;
+                System.out.println("Wrong input - this is not a valid "+ inputType +", try again.");
+                valid = false;
                 scanner.nextLine();
             }
-        } while (!validPath);
+        } while (!valid);
 
-        return path;
+        return input;
+    }
+
+    public static void printExceptionMessege(String s) {
+        System.out.println("Loading the file end with a failure:");
+        System.out.println(s);
+    }
+
+    public static void successLoading() {
+        System.out.println("The File loaded successfully!\n");
+    }
+
+    public static void targetInfoMenu() {
+        System.out.println("Please enter the target's name");
+        System.out.println("   (in order to return to the main menu, press 'QP')");
     }
 }

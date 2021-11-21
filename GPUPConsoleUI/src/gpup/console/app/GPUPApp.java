@@ -1,6 +1,8 @@
 package gpup.console.app;
 
 
+import gpup.console.validation.ConsoleIOValidations;
+import gpup.dto.TargetDTO;
 import gpup.exceptions.TargetExistException;
 import gpup.system.engine.Engine;
 
@@ -45,23 +47,42 @@ public class GPUPApp {
         String path = GPUPConsoleIO.getXmlPath();
 
         try {
-            if (!Files.probeContentType(Paths.get(path)).equals("text/xml")) {
-                System.out.println("The File you entered is not an xml file.");
+            if (!Files.exists(Paths.get(path))) {
+                GPUPConsoleIO.printExceptionMessege("The File you try to laod is not exist.");
                 return;
-            } else if (!Files.exists(Paths.get(path))) {
-                System.out.println("The File you try to laod is not exist.");
+            } else if (!Files.probeContentType(Paths.get(path)).equals("text/xml")) {
+                GPUPConsoleIO.printExceptionMessege("The File you entered is not an xml file.");
                 return;
             } else {
                 engine.buildGraphFromXml(path);
+                GPUPConsoleIO.successLoading();
             }
         } catch (JAXBException ex) {
-            System.out.println("The xml file you try to laod is not valid for this system, try again.");
+            GPUPConsoleIO.printExceptionMessege("The xml file you try to laod is not valid for this system, try again.");
         } catch (FileNotFoundException ex) {
-            System.out.println("Wrong file path - the file you entered is not exist, try again.");
+            GPUPConsoleIO.printExceptionMessege("Wrong file path - the file you entered is not exist, try again.");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            GPUPConsoleIO.printExceptionMessege(e.getMessage());
         }
     }
 
+    private void showTargetInfo() {
+        boolean targetExist = false;
+        boolean quitAction = false;
 
+        do {
+            GPUPConsoleIO.targetInfoMenu();
+            String name = GPUPConsoleIO.getStringInput("name");
+            if (ConsoleIOValidations.isQuit(name)) {
+                break;
+            }
+            try {
+                //TargetDTO targetDTO = engine.getTargetInfo(name);
+                //GPUPConsoleIO.showTargetInfo(targetDTO);
+                System.out.println("target info");
+                targetExist = true;
+            } catch (Exception e){
+            }
+        } while (!targetExist);
+    }
 }
