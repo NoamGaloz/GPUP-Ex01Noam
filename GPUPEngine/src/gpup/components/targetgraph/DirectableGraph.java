@@ -1,6 +1,6 @@
-package gpup.components.graph;
+package gpup.components.targetgraph;
 // לשנות שם?
-public interface DirectableGraph<T> {
+public interface DirectableGraph {
 
     void buildSuperGraph();
 

@@ -16,6 +16,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.NoSuchElementException;
 
 // IMPLEMENT INTERFACE
 public class GPUPEngine implements Engine {
@@ -46,7 +47,10 @@ public class GPUPEngine implements Engine {
 
     @Override
     public TargetDTO getTargetInfo(String name) {
-       return targetGraph.getTargetInfo(name);
+        if (targetGraph.isTargetExist(name)) {
+            return targetGraph.getTargetInfo(name);
+        }
+        throw new NoSuchElementException("There is not a target named: "+ name+"\n");
     }
 
     @Override
@@ -55,13 +59,17 @@ public class GPUPEngine implements Engine {
     }
 
     @Override
-    public boolean IsInitialized() { return targetGraph!=null; }
+    public boolean IsInitialized() {
+        return targetGraph != null;
+    }
 
     @Override
-    public int getTotalTargetsNumber() {return targetGraph.getTotalTargetsNumber();}
+    public int getTotalTargetsNumber() {
+        return targetGraph.count();
+    }
 
     @Override
-    public int getSpecificTypeOfTargetsNum(TargetType targetType){
+    public int getSpecificTypeOfTargetsNum(TargetType targetType) {
         return targetGraph.getSpecificTypeOfTargetsNum(targetType);
     }
 }

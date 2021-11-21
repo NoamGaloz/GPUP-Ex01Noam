@@ -10,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.NoSuchElementException;
 
 public class GPUPApp {
 
@@ -81,7 +82,8 @@ public class GPUPApp {
                     TargetDTO targetDTO = engine.getTargetInfo(name);
                     GPUPConsoleIO.showTargetInfo(targetDTO);
                     targetExist = true;
-                } catch (Exception e) {
+                } catch (NoSuchElementException e) {
+                    GPUPConsoleIO.printMsg(e.getMessage());
                 }
             } while (!targetExist);
         } else {

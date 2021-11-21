@@ -89,7 +89,7 @@ public class GPUPConsoleIO {
     }
 
     public static void ShowTargetsNum(int totalTargetsNumber) {
-        System.out.println("There Are " + totalTargetsNumber + " Targets In The System.");
+        System.out.println("There Are " + totalTargetsNumber + " Targets In The System.\n");
     }
 
     public static void ShowSpecificTargetsNum(TargetType targetType, int specificTypeOfTargetsNum) {
