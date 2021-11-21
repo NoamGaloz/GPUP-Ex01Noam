@@ -13,11 +13,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.NoSuchElementException;
 
 // IMPLEMENT INTERFACE
 public class GPUPEngine implements Engine {
@@ -30,7 +28,7 @@ public class GPUPEngine implements Engine {
     private void loadXmlToTargetGraph(String path) throws FileNotFoundException, JAXBException, TargetExistException {
         final String PACKAGE_NAME = "gpup.jaxb.schema.generated";
         GPUPDescriptor gpupDescriptor;
-        InputStream inputStream = new FileInputStream(new File(path));
+        InputStream inputStream = new FileInputStream(path);
         JAXBContext jc = JAXBContext.newInstance(PACKAGE_NAME);
         Unmarshaller u = jc.createUnmarshaller();
         gpupDescriptor = (GPUPDescriptor) u.unmarshal(inputStream);
@@ -48,7 +46,7 @@ public class GPUPEngine implements Engine {
 
     @Override
     public TargetDTO getTargetInfo(String name) {
-        return null;
+       return targetGraph.getTargetInfo(name);
     }
 
     @Override

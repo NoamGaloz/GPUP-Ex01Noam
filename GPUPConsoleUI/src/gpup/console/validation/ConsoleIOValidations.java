@@ -1,6 +1,6 @@
 package gpup.console.validation;
 
-import jdk.nashorn.internal.runtime.regexp.joni.Regex;
+import gpup.console.app.GPUPConsoleIO;
 
 public class ConsoleIOValidations {
 
@@ -14,6 +14,11 @@ public class ConsoleIOValidations {
 
     public static boolean isQuit(String name) {
         final String QUIT = "QP";
-        return name.equals(QUIT);
+        if(name.equals(QUIT))
+        {
+            GPUPConsoleIO.printMsg("Going back to main menu.");
+            return true;
+        }
+        return false;
     }
 }

@@ -4,10 +4,12 @@ import gpup.components.graph.DirectableGraph;
 import gpup.components.graph.Graph;
 import gpup.components.target.Target;
 import gpup.components.target.TargetType;
+import gpup.dto.TargetDTO;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class TargetGraph implements DirectableGraph<Target> {
 
@@ -61,7 +63,7 @@ public class TargetGraph implements DirectableGraph<Target> {
                 }
             }
         }
-        // Throws EXCEPTION
+        // Throws EXCEPTION ?
     }
 
     public String getWorkingDirectory() {
@@ -76,17 +78,27 @@ public class TargetGraph implements DirectableGraph<Target> {
         return name;
     }
 
-    public int getTotalTargetsNumber() { return dependsOnGraph.count(); }
+    public int getTotalTargetsNumber() {
+        return dependsOnGraph.count();
+    }
 
     public int getSpecificTypeOfTargetsNum(TargetType targetType) {
 
         int counter = 0;
 
-        for (Target t : dependsOnGraph.getKeySet())
-        {
-            if(t.getType()==targetType) counter++;
+        for (Target t : dependsOnGraph.getKeySet()) {
+            if (t.getType() == targetType) counter++;
         }
-         return counter;
+        return counter;
+    }
+
+    public TargetDTO getTargetInfo(String name) {
+        for (Target t : dependsOnGraph.getKeySet()) {
+            if (t.getName().equals(name)) {
+                return new TargetDTO(t);
+            }
+        }
+        throw new NoSuchElementException("There is not a target named: " + name);
     }
 }
 

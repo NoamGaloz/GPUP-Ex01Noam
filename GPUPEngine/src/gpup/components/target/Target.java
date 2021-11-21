@@ -92,7 +92,7 @@ public class Target {
 //    }
 
     public boolean isDependency(Target target, String type) {
-        if (type == "dependsOn") {
+        if (type.equals("dependsOn")) {
             return dependsOnList.contains(target);
         } else {
             return requiredForList.contains(target);
