@@ -30,23 +30,12 @@ public class GPUPEngine implements Engine {
     private void loadXmlToTargetGraph(String path) throws FileNotFoundException, JAXBException, TargetExistException {
         final String PACKAGE_NAME = "gpup.jaxb.schema.generated";
         GPUPDescriptor gpupDescriptor;
-      //  try {
-            InputStream inputStream = new FileInputStream(new File(path));
-            JAXBContext jc = JAXBContext.newInstance(PACKAGE_NAME);
-            Unmarshaller u = jc.createUnmarshaller();
-            gpupDescriptor = (GPUPDescriptor) u.unmarshal(inputStream);
-            targetGraph = GPUPParser.parseTargetGraph(gpupDescriptor);
-//        } catch (JAXBException ex) {
-//
-//        } catch (FileNotFoundException ex) {
-//            throw ex;
-//        } catch (TargetExistException | NoSuchElementException e) {
-//            //5555555555555555555555555555555555555555555555555555555555555555555555555555
-//            //5555555555555555555555555555555555555555555555555555555555555555555555555555
-//            //5555555555555555555555555555555555555555555555555555555555555555555555555555
-//            System.out.println(e.getMessage());
-//        }
+        InputStream inputStream = new FileInputStream(new File(path));
+        JAXBContext jc = JAXBContext.newInstance(PACKAGE_NAME);
+        Unmarshaller u = jc.createUnmarshaller();
+        gpupDescriptor = (GPUPDescriptor) u.unmarshal(inputStream);
 
+        targetGraph = GPUPParser.parseTargetGraph(gpupDescriptor);
     }
 
 
