@@ -16,6 +16,8 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     private Map<String, Target> targetMap;
     //private Map<String, Target> requiredForGraph; // maybe there's no need ?
     private List<Target> leavesList;
+    private List<List<String>> paths = new ArrayList<>();
+
 
     public TargetGraph(String name) {
         this.name = name;
@@ -98,7 +100,39 @@ public class TargetGraph implements DirectableGraph, GraphActions {
 
     @Override
     public void findPaths(String src, String dest, TargetsRelationType type) {
+        if (targetMap.containsKey(src) && targetMap.containsKey(dest) && !src.equals(dest)) {
+            Map<String, Boolean> isVisited = new HashMap<>();
+            List<String> pathList = new ArrayList<>();
+            targetMap.forEach((s, target) -> {
+                isVisited.put(s, false);
+            });
+            if (type.equals(TargetsRelationType.RequiredFor)) {
+                String tmp = src;
+                src = dest;
+                dest = tmp;
+            }
 
+            pathList.add(src);
+            recFindPath(src, dest, isVisited, pathList);
+
+        }
+        throw new NoSuchElementException("The required targets aren't exist");
+    }
+
+    private void recFindPath(String src, String dest, Map<String, Boolean> isVisited, List<String> pathList) {
+        if(src.equals(dest)){
+            paths.add(pathList);
+            return;
+        }
+        isVisited.put(src, true);
+        dependsOnGraph.get(src).forEach(target -> {
+            if(!isVisited.get(target.getName())){
+                pathList.add(target.getName());
+                recFindPath(target.getName(), dest, isVisited, pathList);
+                pathList.remove(target.getName());
+            }
+        });
+        isVisited.put(src, false);
     }
 
     private void buildLeafList() {
@@ -139,11 +173,11 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     }
 
     public TargetDTO getTargetInfo(String name) {
-        if(targetMap.containsKey(name)){
+        if (targetMap.containsKey(name)) {
             return new TargetDTO(targetMap.get(name));
+        } else {
+            throw new NoSuchElementException("There is not a target named: " + name);
         }
-        else{
-        throw new NoSuchElementException("There is not a target named: " + name);
-    }}
+    }
 }
 
