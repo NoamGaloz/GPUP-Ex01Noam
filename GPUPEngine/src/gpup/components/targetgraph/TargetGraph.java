@@ -1,12 +1,12 @@
 package gpup.components.targetgraph;
 
-import gpup.components.target.Target;
-import gpup.components.target.TargetType;
-import gpup.components.target.TargetsRelationType;
+import gpup.components.target.*;
+import gpup.components.task.ProcessingStartStatus;
 import gpup.dto.TargetDTO;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class TargetGraph implements DirectableGraph, GraphActions {
 
@@ -14,6 +14,8 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     private String workingDirectory;
     private Map<String, List<Target>> dependsOnGraph;
     private Map<String, Target> targetMap;
+    private Map<String, List<Target>> gTranspose;
+
 
     private List<Target> leavesList;
 
@@ -52,6 +54,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         });
 
         buildLeafList();
+        updateLeavesAndIndepdentsToWaiting();
     }
 
     @Override
@@ -170,17 +173,34 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         return 0;
     }
 
-    @Override
-    public void buildTransposeGraph() {
-        if (dependsOnGraph.size() != 0) {
-            dependsOnGraph.forEach((s, targets) -> {
-                targets.forEach(target -> {
-                    //requiredForGraph.put(target.getName(), targetMap.get(s));
-                });
-            });
-        }
-        throw new RuntimeException("Can't build transpose graph (Required For)");
-    }
+   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     public int getSpecificTypeOfTargetsNum(TargetType targetType) {
         return (int) targetMap.values()
@@ -195,6 +215,150 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         } else {
             throw new NoSuchElementException("There is not a target named: " + name);
         }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @Override
+    public void buildTransposeGraph() {
+        gTranspose=new HashMap<>();
+        if (dependsOnGraph.size() != 0) {
+            targetMap.forEach(((s, target) -> gTranspose.put(s,new ArrayList<>())));
+            dependsOnGraph.forEach((s, targets) -> {
+             targets.forEach(target -> {
+                 gTranspose.get(target.getName()).add(targetMap.get(s));
+             });
+          });
+        }
+    }
+
+    public Map<String, List<Target>> GetGraph(){
+        return dependsOnGraph;
+    }
+
+
+    public List<Target> getAllWaitingTargets() {
+       List<Target> resList= new ArrayList<>();
+       targetMap.forEach(((s, target) -> {if(target.getRunResult()==RunResult.WAITING){resList.add(target);}}));
+       return resList;
+    }
+
+    public void updateLeavesAndIndepdentsToWaiting(){
+        targetMap.forEach(((s, target) -> {
+            if(target.getType()==TargetType.Leaf || target.getType() == TargetType.Independent){
+                target.setRunResult(RunResult.WAITING);
+            }
+        }));
+    }
+
+
+    public void UpdateTargetAdjAfterFinishWithoutFailure(List<Target> waitingList, Target currentTarget) {
+        for (Target target : gTranspose.get(currentTarget.getName())) {
+            if (target.isAllAdjFinishedWithoutFailure()) {
+                target.setRunResult(RunResult.WAITING);
+                if(!waitingList.contains(target))
+                    waitingList.add(target);
+            }
+        }
+    }
+
+    public void UpdateTargetAdjAfterFinishWithFailure(Target currentTarget) {
+        for (Target target : gTranspose.get(currentTarget.getName())) {
+            target.setRunResult(RunResult.SKIPPED);
+            if (target.isAllAdjFinished())
+                currentTarget.AddToJustOpenedList(target);
+        }
+    }
+
+    public void DfsTravelToUpdateSkippedList(Target currentTarget) {
+
+        Map<Target, Boolean> isVisited = new HashMap<>();
+        targetMap.forEach(((s, target) -> isVisited.put(target,false)));
+        List<Target> skippedList =currentTarget.GetSkippedList();
+        recDfsUpdateSkippedList(isVisited, skippedList ,currentTarget);
+        skippedList.remove(currentTarget);
+    }
+
+    private void recDfsUpdateSkippedList(Map<Target, Boolean> isVisited, List<Target> skippedList, Target currentTarget) {
+        skippedList.add(currentTarget);
+
+        for (Target t : gTranspose.get(currentTarget.getName())) {
+            if (!isVisited.get(t)) {
+                recDfsUpdateSkippedList(isVisited,skippedList,t);
+            }
+        }
+        isVisited.replace(currentTarget,false,true);
+    }
+
+    private void updateTargetsFromScratch() {
+        targetMap.forEach(((s, target) -> {
+            target.setFinishResult(null);
+            target.setRunResult(RunResult.FROZEN);
+        }));
+    }
+
+    private void updateTargetIncremental() {
+        targetMap.forEach(((s, target) -> {
+            if(target.getRunResult().equals(RunResult.FINISHED)){
+            if(target.getFinishResult().equals(FinishResult.FAILURE)) {
+                target.setFinishResult(null);
+                target.setRunResult(RunResult.WAITING);
+            }}
+            if(target.getRunResult().equals(RunResult.SKIPPED))
+                target.setRunResult(RunResult.FROZEN);
+        }));
+    }
+
+    public void PrepareGraphAccordingToProcessingStartStatus(ProcessingStartStatus processingStartStatus,boolean isFirstRunTask) {
+        if(isFirstRunTask){
+            updateLeavesAndIndepdentsToWaiting();
+        if(processingStartStatus == ProcessingStartStatus.Incremental)
+           ; ///////TellUserItsactualyFromScrath
+        }
+        else//notFirstRunTask
+        {
+            if(processingStartStatus == ProcessingStartStatus.Incremental)
+                                             updateTargetIncremental();
+            else {
+                updateTargetsFromScratch();
+                updateLeavesAndIndepdentsToWaiting();
+            }
+        }
+    }
+
+    public void clearAllTargetsHelpingLists() {
+        targetMap.forEach(((s, target) -> {
+            target.ClearHelpingLists();
+        }));
     }
 }
 

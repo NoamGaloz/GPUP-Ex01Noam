@@ -13,6 +13,8 @@ public class Target {
     private TargetType type;
     private RunResult runResult;
     private FinishResult finishResult;
+    List<Target> justOpenedList = new ArrayList<>();
+    List<Target> skippedList = new ArrayList<>();
 
 
 
@@ -111,5 +113,20 @@ public class Target {
         } else {
             return requiredForList.contains(target);
         }
+    }
+
+
+
+    public List<Target> GetSkippedList() {
+        return skippedList;
+    }
+
+    public void AddToJustOpenedList(Target target) {
+        justOpenedList.add(target);
+    }
+
+    public void ClearHelpingLists() {
+        justOpenedList.clear();
+        skippedList.clear();
     }
 }

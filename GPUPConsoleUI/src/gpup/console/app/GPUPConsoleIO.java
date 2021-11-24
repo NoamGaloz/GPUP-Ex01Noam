@@ -1,13 +1,19 @@
 package gpup.console.app;
 
 import gpup.components.target.TargetType;
+import gpup.components.task.simulation.ProcessingTimeType;
+import gpup.console.validation.ConsoleIOValidations;
+
 import gpup.console.validation.IOValidations;
 import gpup.dto.ProcessedTargetDTO;
 import gpup.dto.TargetDTO;
+import sun.security.pkcs11.wrapper.CK_SSL3_KEY_MAT_OUT;
 
 import java.util.InputMismatchException;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.function.Consumer;
+
 
 public class GPUPConsoleIO implements Consumer<ProcessedTargetDTO> {
     @Override
@@ -123,6 +129,176 @@ public class GPUPConsoleIO implements Consumer<ProcessedTargetDTO> {
         System.out.println(targetDTO.toString());
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public static int getProccesingTime() {
+        Scanner scanner = new Scanner(System.in);
+        int processingTime=0;
+        boolean validInput=false;
+
+        while(!validInput) {
+            try{
+            System.out.println("Please Enter The Task Processing Time (for single target) in ms : ");
+            processingTime = scanner.nextInt();
+                validInput=true;
+        }
+            catch(Exception e){
+                System.out.println("Wrong Input - you must enter an integer. ");
+                validInput=false;
+            }
+        }
+
+        return  processingTime;
+    }
+
+    public static int getOptionsInfo(String msg,String firstOpt, String secondOpt) {
+        Scanner scanner = new Scanner(System.in);
+        int processingTime=0;
+        boolean validInput=false;
+
+        while(!validInput) {
+            try{
+                System.out.println(msg);
+                System.out.println(firstOpt);
+                System.out.println(secondOpt);
+                System.out.println("Please Enter your Choise: ( 1 or 2 )");
+                processingTime = scanner.nextInt();
+                validInput=true;
+            }
+            catch(Exception e){
+                System.out.println("Wrong Input - you must enter an integer. ");
+            }
+            if(validInput){
+                validInput = processingTime==2 | processingTime==1 ? true : false;
+                
+                if(!validInput)
+                     System.out.println("Wrong Input - you must enter 1 or 2. ");
+            }
+        }
+
+        return  processingTime;
+    }
+
+    public static float getTargetCompleteProb(String msg) {
+        Scanner scanner = new Scanner(System.in);
+        float succesProb=0;
+        boolean validInput=false;
+
+        while(!validInput) {
+            try{
+                System.out.println(msg);
+                System.out.println("A floating point number between 0 to 1");
+                succesProb = scanner.nextFloat();
+                validInput=true;
+            }
+            catch(Exception e){
+                System.out.println("Wrong Input - you must enter a floating point number. ");
+            }
+            if(validInput){
+                validInput = succesProb>=0&&succesProb<=1 ? true : false;
+
+                if(!validInput)
+                    System.out.println("Wrong Input - you must enter a number between 0 to 1. ");
+            }
+        }
+
+        return  succesProb;
+        }
     public static void continueApp() {
         System.out.println("Press ENTER to continue ...");
         Scanner scanner = new Scanner(System.in);
