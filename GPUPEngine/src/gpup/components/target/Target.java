@@ -13,6 +13,8 @@ public class Target {
     private TargetType type;
     private RunResult runResult;
     private FinishResult finishResult;
+    List<Target> justOpenedList = new ArrayList<>();
+    List<Target> skippedList = new ArrayList<>();
 
     public Target(String name) {
         this.name = name;
@@ -67,6 +69,18 @@ public class Target {
     }
 
     // Methods:
+    public boolean isAllAdjFinished() {
+        return dependsOnList.stream().allMatch(target -> target.getRunResult().equals(RunResult.FINISHED));
+    }
+
+    public boolean isAllAdjFinishedWithoutFailure() {
+        if (isAllAdjFinished()) {
+            return dependsOnList.stream().allMatch(target -> (target.getFinishResult().equals(FinishResult.SUCCESS) || target.getFinishResult().equals(FinishResult.WARNING)));
+        } else {
+            return false;
+        }
+    }
+
     public void addDependOnTarget(Target target) {
         if(!dependsOnList.contains(target))
         dependsOnList.add(target);
@@ -100,7 +114,17 @@ public class Target {
     }
 
 
-    // עיבוד טרגט מקבל זמן ומעדכן רשימת תלויות
 
+    public List<Target> GetSkippedList() {
+        return skippedList;
+    }
 
+    public void AddToJustOpenedList(Target target) {
+        justOpenedList.add(target);
+    }
+
+    public void ClearHelpingLists() {
+        justOpenedList.clear();
+        skippedList.clear();
+    }
 }

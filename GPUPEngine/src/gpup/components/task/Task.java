@@ -1,5 +1,8 @@
 package gpup.components.task;
 
+import gpup.components.target.FinishResult;
+
 public interface Task {
-    void run();
+    FinishResult run();
+    int GetSingleTargetProcessingTimeInMs();
 }

@@ -23,4 +23,9 @@ public interface GraphActions {
     void findPaths(String src, String dest, TargetsRelationType type);
 
 
+
+
+
+
+
 }

@@ -2,6 +2,7 @@ package gpup.console.app;
 
 
 import gpup.components.target.TargetType;
+import gpup.components.task.ProcessingStartStatus;
 import gpup.console.validation.ConsoleIOValidations;
 import gpup.dto.TargetDTO;
 import gpup.system.engine.Engine;
@@ -103,4 +104,116 @@ public class GPUPApp {
             GPUPConsoleIO.unloadedSystem();
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void runTask(){
+
+        int targetProccesingTime = GPUPConsoleIO.getProccesingTime();
+        int taskProcossingTimeType  = GPUPConsoleIO.getOptionsInfo("Do you want Processing Time will be :", "1. Random (limited by the processing time you entered)", "2. Excactly the processing time you entered");
+        float succesProb = GPUPConsoleIO.getTargetCompleteProb("Enter the probability of single target run task, to complete with SUCCES");
+        float ifSucces_withWarningsProb = GPUPConsoleIO.getTargetCompleteProb("Assuming the task completed with SUCCUES, Enter the probability it will be WITH WARNINGS");
+        int howToStart = GPUPConsoleIO.getOptionsInfo("Do you want to start processing :", "1. From Scratch", "2. Incremental (only non-succeded targets)");
+
+        engine.InitTask(targetProccesingTime,taskProcossingTimeType,succesProb,ifSucces_withWarningsProb);
+
+        ProcessingStartStatus procStartStatus = howToStart==1 ? ProcessingStartStatus.FromScratch : ProcessingStartStatus.Incremental;
+
+        engine.SetProcessingStartStatus(procStartStatus);
+
+        engine.RunTask();
+    }
+
 }
+
