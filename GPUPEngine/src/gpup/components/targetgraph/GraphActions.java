@@ -3,6 +3,7 @@ package gpup.components.targetgraph;
 import gpup.components.target.Target;
 import gpup.components.target.TargetsRelationType;
 
+import java.util.List;
 import java.util.Map;
 
 public interface GraphActions {
@@ -20,7 +21,7 @@ public interface GraphActions {
 
     int getEdgesCount();
 
-    void findPaths(String src, String dest, TargetsRelationType type);
+    List<String> findPaths(String src, String dest, TargetsRelationType type);
 
 
 

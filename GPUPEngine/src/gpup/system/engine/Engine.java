@@ -2,6 +2,7 @@ package gpup.system.engine;
 
 import gpup.components.target.TargetType;
 import gpup.components.task.ProcessingStartStatus;
+import gpup.components.target.TargetsRelationType;
 import gpup.dto.TargetDTO;
 import gpup.dto.TargetGraphDTO;
 import gpup.exceptions.TargetExistException;
@@ -18,7 +19,7 @@ public interface Engine {
 
     boolean IsInitialized();
 
-    int getTotalTargetsNumber();
+    int getTargetsCount();
 
     int getSpecificTypeOfTargetsNum(TargetType targetType);
 
@@ -37,4 +38,8 @@ public interface Engine {
     void SetProcessingStartStatus(ProcessingStartStatus processingStartStatus);
 
     void RunTask();
+
+    PathsDTO findPaths(String src, String dest, TargetsRelationType type);
+
+    void createTaskDirectory();
 }

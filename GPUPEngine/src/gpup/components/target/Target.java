@@ -1,8 +1,8 @@
 package gpup.components.target;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+
+
 
 public class Target {
 
@@ -15,6 +15,8 @@ public class Target {
     private FinishResult finishResult;
     List<Target> justOpenedList = new ArrayList<>();
     List<Target> skippedList = new ArrayList<>();
+
+
 
     public Target(String name) {
         this.name = name;
@@ -82,8 +84,8 @@ public class Target {
     }
 
     public void addDependOnTarget(Target target) {
-        if(!dependsOnList.contains(target))
-        dependsOnList.add(target);
+        if (!dependsOnList.contains(target))
+            dependsOnList.add(target);
     }
 
     public void addRequiredForTarget(Target target) {

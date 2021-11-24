@@ -3,6 +3,9 @@ package gpup.console.app;
 import gpup.components.target.TargetType;
 import gpup.components.task.simulation.ProcessingTimeType;
 import gpup.console.validation.ConsoleIOValidations;
+
+import gpup.console.validation.IOValidations;
+import gpup.dto.ProcessedTargetDTO;
 import gpup.dto.TargetDTO;
 import sun.security.pkcs11.wrapper.CK_SSL3_KEY_MAT_OUT;
 
@@ -11,7 +14,16 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
-public class GPUPConsoleIO  {
+
+public class GPUPConsoleIO implements Consumer<ProcessedTargetDTO> {
+    @Override
+    public void accept(ProcessedTargetDTO processedTarget) {
+        System.out.println(processedTarget.getName());
+    }
+
+    public static void welcome() {
+        System.out.println("Hello and welcome to G.P.U.P - Generic system for streamlining and improving processes");
+    }
 
     public static UserInput mainMenu() {
         int input;
@@ -22,20 +34,23 @@ public class GPUPConsoleIO  {
                 " 4. Find dependency between 2 targets\n" +
                 " 5. Run a task\n" +
                 " 6. Exit");
-        System.out.println("(-- At each stage of the program, pressing 'QP' will return you to the main menu --)\n");
-        input = getMainMenuInput();
+        System.out.println("(-- At each stage of the program, pressing '0' will return you to the main menu --)\n");
+        input = getIntegerInput();
         return UserInput.values()[input];
     }
 
-    private static int getMainMenuInput() {
+    public static int getIntegerInput() {
         Scanner scanner = new Scanner(System.in);
         int value = 0;
         boolean validInput;
 
         do {
-            System.out.print("Please choose your action: ");
+            System.out.print("Please choose an option: ");
             try {
                 value = scanner.nextInt();
+                if (value == 0) { // quit
+                    break;
+                }
                 validInput = true;
             } catch (InputMismatchException ex) {
                 System.out.println("Wrong input - this is not a number, try again.");
@@ -43,7 +58,7 @@ public class GPUPConsoleIO  {
                 scanner.nextLine();
             }
             if (validInput) {
-                validInput = ConsoleIOValidations.integerRangeCheck(value);
+                validInput = IOValidations.integerRangeCheck(value);
                 if (!validInput) {
                     System.out.println("Wrong input - please enter a valid number.");
                 }
@@ -57,10 +72,13 @@ public class GPUPConsoleIO  {
         String path;
         System.out.println("Enter the full path of the XML file you want to load:");
         path = getStringInput("path"); // return a valid path, yet no promise of existing file
+        if (path.matches(".*[א-ת]+.*")) {
+            return null;
+        }
         return path;
     }
 
-    static String getStringInput(String msg) {
+    public static String getStringInput(String msg) {
         Scanner scanner = new Scanner(System.in);
         boolean valid;
         String input = null;
@@ -69,7 +87,7 @@ public class GPUPConsoleIO  {
                 input = scanner.nextLine();
                 valid = true;
             } catch (Exception ex) {
-                System.out.println("Wrong input - this is not a valid "+ msg +", try again.");
+                System.out.println("Wrong input - this is not a valid " + msg + ", try again.");
                 valid = false;
                 scanner.nextLine();
             }
@@ -78,8 +96,8 @@ public class GPUPConsoleIO  {
         return input;
     }
 
-    public static void printExceptionMessage(String s) {
-        System.out.println("Loading the file end with a failure:");
+    public static void failedLoadSystem(String s) {
+        System.out.println("Loading the file ended with a failure:");
         System.out.println(s);
     }
 
@@ -88,16 +106,15 @@ public class GPUPConsoleIO  {
     }
 
     public static void targetNameRequest() {
-        System.out.println("Please enter a target's name");
-        System.out.println("   (in order to return to the main menu, press 'QP')");
+        System.out.println("Please enter a target's name: (to return to the main menu, press '0')");
     }
 
-    public static void ShowTargetsNum(int totalTargetsNumber) {
+    public static void showTargetsCount(int totalTargetsNumber) {
         System.out.println("There Are " + totalTargetsNumber + " Targets In The System.\n");
     }
 
-    public static void ShowSpecificTargetsNum(TargetType targetType, int specificTypeOfTargetsNum) {
-        System.out.println("There Are " + specificTypeOfTargetsNum + " " + targetType.name() +" Targets In The System.");
+    public static void showTargetCountByType(TargetType targetType, int specificTypeOfTargetsNum) {
+        System.out.println("There Are " + specificTypeOfTargetsNum + " " + targetType.name() + " Targets In The System.");
     }
 
     public static void printMsg(String s) {
@@ -281,5 +298,26 @@ public class GPUPConsoleIO  {
         }
 
         return  succesProb;
+        }
+    public static void continueApp() {
+        System.out.println("Press ENTER to continue ...");
+        Scanner scanner = new Scanner(System.in);
+        scanner.nextLine();
+    }
+
+    public static UserInput exit() {
+        System.out.println("The System is about the end");
+        do {
+            System.out.println("Are you sure you want to exit? (Y/N)");
+            String answer = getStringInput("answer");
+            switch (answer) {
+                case "Y":
+                    return UserInput.QUIT;
+                case "N":
+                    return UserInput.INIT;
+                default:
+                    System.out.println("This is not a valid answer, try again");
+            }
+        } while (true);
     }
 }

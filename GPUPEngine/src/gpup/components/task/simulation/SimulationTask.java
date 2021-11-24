@@ -33,7 +33,6 @@ public class SimulationTask implements Task {
 
         return res;
     }
-
     public int GetSingleTargetProcessingTimeInMs(){
         int res=0;
         switch (processingTimeType){

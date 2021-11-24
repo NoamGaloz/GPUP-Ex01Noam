@@ -5,4 +5,7 @@ import gpup.components.target.FinishResult;
 public interface Task {
     FinishResult run();
     int GetSingleTargetProcessingTimeInMs();
+
+
+
 }

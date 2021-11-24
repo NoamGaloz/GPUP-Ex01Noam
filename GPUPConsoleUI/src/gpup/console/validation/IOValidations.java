@@ -2,7 +2,7 @@ package gpup.console.validation;
 
 import gpup.console.app.GPUPConsoleIO;
 
-public class ConsoleIOValidations {
+public class IOValidations {
 
     public static boolean integerRangeCheck(int value) {
         final int START_RANGE = 1;
@@ -13,7 +13,7 @@ public class ConsoleIOValidations {
 
 
     public static boolean isQuit(String name) {
-        final String QUIT = "QP";
+        final String QUIT = "0";
         if(name.equals(QUIT))
         {
             GPUPConsoleIO.printMsg("Going back to main menu.");
