@@ -14,9 +14,9 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     private String workingDirectory;
     private Map<String, List<Target>> dependsOnGraph;
     private Map<String, Target> targetMap;
-    //private Map<String, Target> requiredForGraph; // maybe there's no need ?
+
     private List<Target> leavesList;
-    private List<List<String>> paths = new ArrayList<>();
+
 
 
     public TargetGraph(String name) {
@@ -99,39 +99,56 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     }
 
     @Override
-    public void findPaths(String src, String dest, TargetsRelationType type) {
-        if (targetMap.containsKey(src) && targetMap.containsKey(dest) && !src.equals(dest)) {
-            Map<String, Boolean> isVisited = new HashMap<>();
-            List<String> pathList = new ArrayList<>();
-            targetMap.forEach((s, target) -> {
-                isVisited.put(s, false);
-            });
-            if (type.equals(TargetsRelationType.RequiredFor)) {
-                String tmp = src;
-                src = dest;
-                dest = tmp;
-            }
+    public List<String> findPaths(String src, String dest, TargetsRelationType type) {
+        List<String> paths = new ArrayList<>();
+        Map<String, Boolean> isVisited = new HashMap<>();
+        List<String> pathList = new ArrayList<>();
 
-            pathList.add(src);
-            recFindPath(src, dest, isVisited, pathList);
+        targetMap.forEach((s, target) -> {
+            isVisited.put(s, false);
+        });
 
+        if (type.equals(TargetsRelationType.RequiredFor)) {
+            String tmp = src;
+            src = dest;
+            dest = tmp;
         }
-        throw new NoSuchElementException("The required targets aren't exist");
+
+        pathList.add(src);
+        recFindPath(src, dest, isVisited, pathList, paths);
+        if (type.equals(TargetsRelationType.RequiredFor)) {
+            reversePathsList(paths);
+        }
+
+        return paths;
     }
 
-    private void recFindPath(String src, String dest, Map<String, Boolean> isVisited, List<String> pathList) {
-        if(src.equals(dest)){
-            paths.add(pathList);
+    private void reversePathsList(List<String> paths) {
+
+        StringBuilder str = new StringBuilder();
+
+        for (int i = 0; i < paths.size(); i++) {
+            str.append(paths.get(i).substring(1, paths.get(i).length() - 1));
+            str.reverse();
+            paths.remove(i);
+            paths.add(i, str.toString());
+            str.setLength(0);
+        }
+    }
+
+    private void recFindPath(String src, String dest, Map<String, Boolean> isVisited, List<String> localPath, List<String> paths) {
+        if (src.equals(dest)) {
+            paths.add(localPath.toString());
             return;
         }
         isVisited.put(src, true);
-        dependsOnGraph.get(src).forEach(target -> {
-            if(!isVisited.get(target.getName())){
-                pathList.add(target.getName());
-                recFindPath(target.getName(), dest, isVisited, pathList);
-                pathList.remove(target.getName());
+        for (Target t : dependsOnGraph.get(src)) {
+            if (!isVisited.get(t.getName())) {
+                localPath.add(t.getName());
+                recFindPath(t.getName(), dest, isVisited, localPath, paths);
+                localPath.remove(t.getName());
             }
-        });
+        }
         isVisited.put(src, false);
     }
 
