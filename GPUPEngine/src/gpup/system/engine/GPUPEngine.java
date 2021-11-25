@@ -136,7 +136,7 @@ public class GPUPEngine implements Engine {
         }
 
         totalEnd = Instant.now();
-        totalRunDuration = Duration.between(totalStart, totalEnd);
+        Duration totalRunDuration = Duration.between(totalStart, totalEnd);
          StatisticsDTO statisticsDTO = calcStatistics(totalRunDuration);
          consumer.accept(statisticsDTO);
     }
@@ -146,7 +146,7 @@ public class GPUPEngine implements Engine {
     public PathsDTO findPaths(String src, String dest, TargetsRelationType type) {
         if (!src.equals(dest)) {
             if (targetGraph.isTargetExist(src) && targetGraph.isTargetExist(dest)) {
-                return new PathsDTO(targetGraph.findPaths(src, dest, type), src, dest, type);
+                return new PathsDTO(targetGraph.findPaths(dest, type, src), src, dest, type);
             } else {
                 throw new NoSuchElementException("The required targets aren't exist");
             }
