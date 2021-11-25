@@ -1,22 +1,29 @@
 package gpup.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CircuitDTO {
-    private String circuit;
+    private List<String> circuit;
 
     @Override
     public String toString() {
-        return "CircuitDTO{" +
-                "circuit='" + circuit + '\'' +
-                '}';
+        String str="";
+
+        if(circuit!=null){
+            for (String s : circuit) {
+                str += s + " --> ";
+            }
+            str = str.substring(0,str.length()-4);
+        }
+        else
+            str=" No Circle Includes Your Target";
+
+        return str;
     }
 
     public CircuitDTO(List<String> circuit) {
-        this.circuit = updateCircuit(circuit);
+        this.circuit = circuit;
     }
 
-    private String updateCircuit(List<String> circuit) {
-        return null;
-    }
 }

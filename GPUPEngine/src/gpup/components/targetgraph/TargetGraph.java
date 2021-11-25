@@ -5,7 +5,6 @@ import gpup.components.task.ProcessingStartStatus;
 import gpup.dto.StatisticsDTO;
 import gpup.dto.TargetDTO;
 
-import javax.xml.bind.annotation.XmlElement;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -89,7 +88,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     }
 
     @Override
-    public List<String> findPaths(String src, String dest, TargetsRelationType type) {
+    public List<String> findPaths(String dest, TargetsRelationType type, String src) {
         List<String> paths = new ArrayList<>();
         Map<String, Boolean> isVisited = new HashMap<>();
         List<String> pathList = new ArrayList<>();
@@ -166,7 +165,17 @@ public class TargetGraph implements DirectableGraph, GraphActions {
 
     @Override
     public List<String> findCircuit(String src) {
-        return null;}
+        Map<Target, Boolean> isVisited = new HashMap<>();
+        List<String> circuteList = new ArrayList<>();
+        boolean foundCircuit=false;
+
+        targetMap.forEach((s, target) -> isVisited.put(target, false));
+
+       if(recDfsFindCircuitWithGivenTarget(isVisited,circuteList,targetMap.get(src),targetMap.get(src),foundCircuit,true))
+           return circuteList;
+
+        return null;
+    }
 
     public List<Target> getAllWaitingTargets() {
         List<Target> resList = new ArrayList<>();
@@ -275,6 +284,28 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         }));
 
         return targetsRunInfoList;
+    }
+
+
+    private Boolean recDfsFindCircuitWithGivenTarget(Map<Target, Boolean> isVisited, List<String> circuitList, Target currentTarget,Target src,Boolean foundCirc, Boolean isFirstIter) {
+
+        circuitList.add(currentTarget.getName());
+
+        for (Target t : dependsOnGraph.get(currentTarget.getName())) {
+                if (!isFirstIter && t.equals(src)) {
+                    //foundCirc = true;
+                    circuitList.add(src.getName());
+                    return true;
+                }
+                if (!isVisited.get(t)) {
+                   return recDfsFindCircuitWithGivenTarget(isVisited, circuitList, t, src, foundCirc, false);
+                }
+        }
+
+        isVisited.replace(currentTarget, false, true);
+        circuitList.remove(currentTarget.getName());
+
+        return false;
     }
 }
 
