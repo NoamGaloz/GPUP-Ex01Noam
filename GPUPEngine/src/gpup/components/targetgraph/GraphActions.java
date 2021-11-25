@@ -21,7 +21,7 @@ public interface GraphActions {
 
     int getEdgesCount();
 
-    List<String> findPaths(String src, String dest, TargetsRelationType type);
+    List<String> findPaths(String dest, TargetsRelationType type, String src);
 
 
 

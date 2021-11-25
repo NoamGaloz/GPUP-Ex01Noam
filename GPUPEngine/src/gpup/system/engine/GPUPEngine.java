@@ -136,9 +136,9 @@ public class GPUPEngine implements Engine {
         }
 
         totalEnd = Instant.now();
-        Duration totalRunDuration = Duration.between(totalStart, totalEnd);
-        StatisticsDTO statisticsDTO = calcStatistics(totalRunDuration);
-        consumer.accept(statisticsDTO);
+         Duration totalRunDuration = Duration.between(totalStart, totalEnd);
+         StatisticsDTO statisticsDTO = calcStatistics(totalRunDuration);
+         consumer.accept(statisticsDTO);
     }
 
 
@@ -160,6 +160,7 @@ public class GPUPEngine implements Engine {
         String creationTime = new SimpleDateFormat("dd.MM.yyyy HH.mm.ss").format(Calendar.getInstance().getTime());
         path = path + targetGraph.getName() + " - " + creationTime;
         return path;
+        
     }
 
     @Override
@@ -196,11 +197,36 @@ public class GPUPEngine implements Engine {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private StatisticsDTO calcStatistics(Duration totalRunDuration) {
 
         List<StatisticsDTO.TargetRunDTO> targetsRunInfoList = targetGraph.getTargetsRunInfoList();
 
-        return new StatisticsDTO(totalRunDuration, targetsRunInfoList);
+        return new StatisticsDTO(totalRunDuration,targetsRunInfoList);
     }
 
 }
