@@ -2,6 +2,7 @@ package gpup.components.targetgraph;
 
 import gpup.components.target.*;
 import gpup.components.task.ProcessingStartStatus;
+import gpup.dto.StatisticsDTO;
 import gpup.dto.TargetDTO;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -262,6 +263,18 @@ public class TargetGraph implements DirectableGraph, GraphActions {
 
     public void clearAllTargetsHelpingLists() {
         targetMap.forEach(((s, target) -> target.ClearHelpingLists()));
+    }
+
+    public List<StatisticsDTO.TargetRunDTO> getTargetsRunInfoList() {
+
+        List<StatisticsDTO.TargetRunDTO> targetsRunInfoList=new ArrayList<>();
+
+        targetMap.forEach(((s, target) -> {
+            StatisticsDTO.TargetRunDTO targetRunDTO= new StatisticsDTO().new TargetRunDTO(s,target.getFinishResult(),target.getTaskRunDuration());
+            targetsRunInfoList.add(targetRunDTO);
+        }));
+
+        return targetsRunInfoList;
     }
 }
 

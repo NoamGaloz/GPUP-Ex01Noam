@@ -64,7 +64,6 @@ public class GPUPApp {
         }
         GPUPConsoleIO.printMsg("Goodbye!");
     }
-
     private void findCircuit() {
         GPUPConsoleIO.printMsg("Please enter a target name to see if it is part of a Circuit: ");
         String name = GPUPConsoleIO.getStringInput("name");

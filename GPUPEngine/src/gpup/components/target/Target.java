@@ -119,4 +119,8 @@ public class Target {
         justOpenedList.clear();
         skippedList.clear();
     }
+
+    public Duration getTaskRunDuration() {
+        return taskRunDuration;
+    }
 }
