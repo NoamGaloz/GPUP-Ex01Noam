@@ -42,9 +42,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
             dependsOnGraph.put(target.getName(), new LinkedList<>());
             targetMap.put(target.getName(), target);
         });
-
         targetMap.values().forEach(target -> target.getDependsOnList().forEach(target1 -> addEdge(target.getName(), target1)));
-
         updateLeavesAndIndepedentsToWaiting();
     }
 
