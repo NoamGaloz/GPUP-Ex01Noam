@@ -1,15 +1,8 @@
 package gpup.system.engine;
 
-import gpup.components.target.FinishResult;
-import gpup.components.target.RunResult;
-
-import gpup.components.target.Target;
-import gpup.components.target.TargetType;
-import gpup.components.target.TargetsRelationType;
+import gpup.components.target.*;
 import gpup.components.targetgraph.TargetGraph;
-import gpup.components.task.ProcessingStartStatus;
-import gpup.components.task.Task;
-
+import gpup.components.task.*;
 import gpup.components.task.simulation.ProcessingTimeType;
 import gpup.components.task.simulation.SimulationTask;
 import gpup.dto.*;
@@ -20,15 +13,12 @@ import gpup.jaxb.schema.parser.GPUPParser;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.rmi.RemoteException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -41,8 +31,6 @@ public class GPUPEngine implements Engine {
     private TargetGraph targetGraph;
     private Task task; // can it run several tasks?
     private ProcessingStartStatus processingStartStatus;
-    //    private boolean isFirstRunTask = true;
-    private Duration totalRunDuration;
 
 
     public GPUPEngine() {
@@ -84,12 +72,10 @@ public class GPUPEngine implements Engine {
         return targetGraph != null;
     }
 
-    @Override
     public int getTargetsCount() {
         return targetGraph.count();
     }
 
-    @Override
     public int getSpecificTypeOfTargetsNum(TargetType targetType) {
         return targetGraph.getSpecificTypeOfTargetsNum(targetType);
     }
@@ -107,8 +93,6 @@ public class GPUPEngine implements Engine {
 
     @Override
     public void RunTask(Consumer<ConsumerDTO> consumer) throws InterruptedException, IOException {
-
-        String output;
         Instant totalStart, totalEnd, start, end;
         List<Target> waitingList;
 
@@ -152,7 +136,8 @@ public class GPUPEngine implements Engine {
         }
 
         totalEnd = Instant.now();
-        totalRunDuration = Duration.between(totalStart, totalEnd);
+        //    private boolean isFirstRunTask = true;
+        Duration totalRunDuration = Duration.between(totalStart, totalEnd);
         // StatDTO statisticsDTO = calcStatistics();
         // consumer.accept(statisticsDTO);
 
@@ -178,6 +163,7 @@ public class GPUPEngine implements Engine {
         String creationTime = new SimpleDateFormat("dd.MM.yyyy HH.mm.ss").format(Calendar.getInstance().getTime());
         path = path + targetGraph.getName() + " - " + creationTime;
         return path;
+        
     }
 
     @Override
@@ -195,23 +181,21 @@ public class GPUPEngine implements Engine {
         return task == null;
     }
 
+    @Override
+    public CircuitDTO findCircuit(String targetName) {
+        return new CircuitDTO(targetGraph.findCircuit(targetName));
+    }
+
     private void writeTargetToFile(Instant start, Instant end, ConsumerDTO target, String path) throws IOException {
         String fileName = target.getName() + ".log";
-        Writer out = null;
-        try {
-            out = new BufferedWriter(
-                    new OutputStreamWriter(
-                            new FileOutputStream(path + "/" + fileName))); // task.getDirName()
+        try (Writer out = new BufferedWriter(
+                new OutputStreamWriter(
+                        new FileOutputStream(path + "/" + fileName)))) {
+            // task.getDirName()
             // write to file:
             out.write(start.toString());
             out.write(target.toString());
             out.write(end.toString());
-
-
-        } finally {
-            if (out != null) {
-                out.close();
-            }
         }
     }
 }

@@ -20,18 +20,12 @@ public class PathsDTO {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        str.append(type.name() + " Paths from " + srcName + " to " + destName + ":\n");
+        str.append(type.name()).append(" Paths from ").append(srcName).append(" to ").append(destName).append(":\n");
         if (paths == null || paths.size() == 0) {
             str.append("There are no paths.");
         } else {
-            paths.forEach(s -> {
-                str.append(s+"\n");
-            });
+            paths.forEach(s -> str.append(s).append("\n"));
         }
         return str.toString();
-    }
-
-    public List<String> getPaths() {
-        return paths;
     }
 }

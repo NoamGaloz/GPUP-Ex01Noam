@@ -1,11 +1,9 @@
 package gpup.system.engine;
 
-import gpup.components.target.TargetType;
 import gpup.components.task.ProcessingStartStatus;
 import gpup.components.target.TargetsRelationType;
 import gpup.dto.*;
 import gpup.exceptions.TargetExistException;
-
 import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,12 +18,7 @@ public interface Engine {
 
     boolean IsInitialized();
 
-    int getTargetsCount();
-
-    int getSpecificTypeOfTargetsNum(TargetType targetType);
-
     void InitTask(int targetProcessingTimeMs, int taskProcessingTimeType, float successProb, float successWithWarningsProb, ProcessingStartStatus status);
-
 
     void SetProcessingStartStatus(ProcessingStartStatus processingStartStatus);
 
@@ -36,4 +29,6 @@ public interface Engine {
     void createTaskDirectory(String path);
 
     boolean isFirstTaskRun();
+
+    CircuitDTO findCircuit(String targetName);
 }

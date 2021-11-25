@@ -4,6 +4,7 @@ import gpup.components.target.*;
 import gpup.components.task.ProcessingStartStatus;
 import gpup.dto.TargetDTO;
 
+import javax.xml.bind.annotation.XmlElement;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -17,15 +18,10 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     private Map<String, List<Target>> gTranspose;
 
 
-    private List<Target> leavesList;
-
-
     public TargetGraph(String name) {
         this.name = name;
         dependsOnGraph = new HashMap<>();
-        //requiredForGraph = new HashMap<>();
         targetMap = new HashMap<>();
-        leavesList = new ArrayList<>();
     }
 
     public String getWorkingDirectory() {
@@ -46,14 +42,9 @@ public class TargetGraph implements DirectableGraph, GraphActions {
             targetMap.put(target.getName(), target);
         });
 
-        targetMap.values().forEach(target -> {
-            target.getDependsOnList().forEach(target1 -> {
-                addEdge(target.getName(), target1);
-            });
-        });
+        targetMap.values().forEach(target -> target.getDependsOnList().forEach(target1 -> addEdge(target.getName(), target1)));
 
-        buildLeafList();
-        updateLeavesAndIndepdentsToWaiting();
+        updateLeavesAndIndepedentsToWaiting();
     }
 
     @Override
@@ -92,11 +83,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     @Override
     public int getEdgesCount() {
         AtomicInteger count = new AtomicInteger();
-        dependsOnGraph.values().forEach(list -> {
-            list.forEach(target -> {
-                count.getAndIncrement();
-            });
-        });
+        dependsOnGraph.values().forEach(list -> list.forEach(target -> count.getAndIncrement()));
         return count.get();
     }
 
@@ -106,9 +93,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         Map<String, Boolean> isVisited = new HashMap<>();
         List<String> pathList = new ArrayList<>();
 
-        targetMap.forEach((s, target) -> {
-            isVisited.put(s, false);
-        });
+        targetMap.forEach((s, target) -> isVisited.put(s, false));
 
         if (type.equals(TargetsRelationType.RequiredFor)) {
             String tmp = src;
@@ -130,7 +115,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         StringBuilder str = new StringBuilder();
 
         for (int i = 0; i < paths.size(); i++) {
-            str.append(paths.get(i).substring(1, paths.get(i).length() - 1));
+            str.append(paths.get(i), 1, paths.get(i).length() - 1);
             str.reverse();
             paths.remove(i);
             paths.add(i, str.toString());
@@ -154,25 +139,6 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         isVisited.put(src, false);
     }
 
-    private void buildLeafList() {
-        targetMap.values().forEach(target -> {
-            if (target.getType() == TargetType.Leaf) {
-                leavesList.add(target);
-            }
-        });
-    }
-
-    @Override
-    public void buildSuperGraph() {
-
-    }
-
-    @Override
-    public int getConnectedComponentsCount() {
-        return 0;
-    }
-
-
     public int getSpecificTypeOfTargetsNum(TargetType targetType) {
         return (int) targetMap.values()
                 .stream()
@@ -188,24 +154,18 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         }
     }
 
-
     @Override
     public void buildTransposeGraph() {
         gTranspose = new HashMap<>();
         if (dependsOnGraph.size() != 0) {
             targetMap.forEach(((s, target) -> gTranspose.put(s, new ArrayList<>())));
-            dependsOnGraph.forEach((s, targets) -> {
-                targets.forEach(target -> {
-                    gTranspose.get(target.getName()).add(targetMap.get(s));
-                });
-            });
+            dependsOnGraph.forEach((s, targets) -> targets.forEach(target -> gTranspose.get(target.getName()).add(targetMap.get(s))));
         }
     }
 
-    public Map<String, List<Target>> GetGraph() {
-        return dependsOnGraph;
-    }
-
+    @Override
+    public List<String> findCircuit(String src) {
+        return null;}
 
     public List<Target> getAllWaitingTargets() {
         List<Target> resList = new ArrayList<>();
@@ -217,7 +177,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         return resList;
     }
 
-    public void updateLeavesAndIndepdentsToWaiting() {
+    public void updateLeavesAndIndepedentsToWaiting() {
         targetMap.forEach(((s, target) -> {
             if (target.getType() == TargetType.Leaf || target.getType() == TargetType.Independent) {
                 target.setRunResult(RunResult.WAITING);
@@ -288,25 +248,20 @@ public class TargetGraph implements DirectableGraph, GraphActions {
 
     public void PrepareGraphAccordingToProcessingStartStatus(ProcessingStartStatus processingStartStatus, boolean isFirstRunTask) {
         if (isFirstRunTask) {
-            updateLeavesAndIndepdentsToWaiting();
-//            if (processingStartStatus == ProcessingStartStatus.Incremental) {
-//                ; ///////Tell User It's actually From Scrath
-//            }
+            updateLeavesAndIndepedentsToWaiting();
         } else//not First Run Task
         {
             if (processingStartStatus == ProcessingStartStatus.Incremental)
                 updateTargetIncremental();
             else {
                 updateTargetsFromScratch();
-                updateLeavesAndIndepdentsToWaiting();
+                updateLeavesAndIndepedentsToWaiting();
             }
         }
     }
 
     public void clearAllTargetsHelpingLists() {
-        targetMap.forEach(((s, target) -> {
-            target.ClearHelpingLists();
-        }));
+        targetMap.forEach(((s, target) -> target.ClearHelpingLists()));
     }
 }
 

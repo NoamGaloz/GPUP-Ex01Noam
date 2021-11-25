@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TargetDTO {
-    private String name;
-    private String userData;
+    private final String name;
+    private final String userData;
     private List<String> requiredForList;
     private List<String> dependsOnList;
-    private TargetType type;
-    private RunResult runResult;
-    private FinishResult finishResult;
+    private final TargetType type;
+    private final RunResult runResult;
+    private final FinishResult finishResult;
 
     public TargetDTO(Target target) {
         name = target.getName();
@@ -27,9 +27,6 @@ public class TargetDTO {
         requiredForList = updateList(target.getRequiredForList());
     }
 
-    public String getUserData() {
-        return userData;
-    }
 
     public String getName() {
         return name;
@@ -92,7 +89,7 @@ public class TargetDTO {
                     str.append(name);
                     i++;
                 } else {
-                    str.append(" , " + name);
+                    str.append(" , ").append(name);
                 }
             }
         } else {

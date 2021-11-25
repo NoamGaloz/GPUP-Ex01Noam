@@ -7,35 +7,28 @@ import gpup.components.task.Task;
 import java.util.Random;
 
 public class SimulationTask implements Task {
-    private String name;
-    private int processingTimeInMs;
-    private ProcessingTimeType processingTimeType;
-    private float succesProb;
-    private float successWithWarningsProb;
+    private final String name;
+    private final int processingTimeInMs;
+    private final ProcessingTimeType processingTimeType;
+    private final float successProb;
+    private final float successWithWarningsProb;
     private String dirPath;
-
-    public long getSleepingTime() {
-        return sleepingTime;
-    }
-
     private long sleepingTime;
-    Random random;
+    private Random random;
 
     public SimulationTask(String name, ProcessingTimeType processingTime, float succesProb, float ifSucces_withWarningsProb, int processingTimeInMs) {
         this.random = new Random();
         this.name = name;
         this.processingTimeInMs = processingTimeInMs;
         this.processingTimeType = processingTime;
-        this.succesProb = succesProb;
+        this.successProb = succesProb;
         this.successWithWarningsProb = ifSucces_withWarningsProb;
         calcSingleTargetProcessingTimeInMs();
-
-
     }
 
     public FinishResult run() throws InterruptedException {
         float LuckyNumber = (float) Math.random();
-        FinishResult res = LuckyNumber < succesProb ? FinishResult.SUCCESS : FinishResult.FAILURE;
+        FinishResult res = LuckyNumber < successProb ? FinishResult.SUCCESS : FinishResult.FAILURE;
 
         if (res == FinishResult.SUCCESS) {
             LuckyNumber = (float) Math.random();
@@ -58,14 +51,6 @@ public class SimulationTask implements Task {
     @Override
     public long getProcessingTime() {
         return sleepingTime;
-    }
-
-    @Override
-    public void updateData(ProcessingTimeType procTimeType, float successProb, float successWithWarningsProb, int targetProcessingTimeMs) {
-        this.processingTimeInMs = processingTimeInMs;
-        this.processingTimeType = procTimeType;
-        this.succesProb = successProb;
-        this.successWithWarningsProb = successWithWarningsProb;
     }
 
     private void calcSingleTargetProcessingTimeInMs() {

@@ -11,7 +11,4 @@ public interface Task {
     void setDirectoryPath(String path);
 
     long getProcessingTime();
-
-    default void updateData(ProcessingTimeType procTimeType, float successProb, float successWithWarningsProb, int targetProcessingTimeMs) {
-    }
 }
