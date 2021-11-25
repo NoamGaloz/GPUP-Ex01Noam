@@ -47,6 +47,9 @@ public class GPUPApp {
                     case TASK:
                         runTask();
                         break;
+                    case CIRCUIT:
+                     // //  findCircuit();
+                        break;
                     case QUIT:
                         userInput = GPUPConsoleIO.exit();
                         break;
@@ -60,6 +63,7 @@ public class GPUPApp {
         }
         GPUPConsoleIO.printMsg("Goodbye!");
     }
+
 
     private void findPaths() {
         GPUPConsoleIO.printMsg("Please enter 2 targets by name\nFirst target (from):");

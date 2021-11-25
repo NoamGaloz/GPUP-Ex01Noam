@@ -147,16 +147,14 @@ public class GPUPEngine implements Engine {
             consumerDTO.setTaskOutput(new SimulationOutputDTO(task.getProcessingTime()));
             //Writing to file
             writeTargetToFile(start, end, consumerDTO, task.getDirectoryPath());
-            // calling to consumer.accept
+            // Writing to console
             consumer.accept(consumerDTO);
         }
 
         totalEnd = Instant.now();
         totalRunDuration = Duration.between(totalStart, totalEnd);
-        // StatDTO statisticsDTO = calcStatistics();
-        // consumer.accept(statisticsDTO);
-
-
+         StatisticsDTO statisticsDTO = calcStatistics(totalRunDuration);
+         consumer.accept(statisticsDTO);
     }
 
 
@@ -214,4 +212,38 @@ public class GPUPEngine implements Engine {
             }
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private StatisticsDTO calcStatistics(Duration totalRunDuration) {
+
+        List<StatisticsDTO.TargetRunDTO> targetsRunInfoList = targetGraph.getTargetsRunInfoList();
+
+        return new StatisticsDTO(totalRunDuration,targetsRunInfoList);
+    }
+
 }

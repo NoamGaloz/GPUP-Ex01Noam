@@ -24,7 +24,7 @@ public class GPUPConsoleIO {
                 " 5. Run a task\n" +
                 " 6. Exit\n");
         System.out.println("(-- At each stage of the program, pressing '0' will return you to the main menu --)");
-        input = getIntegerInRange(7, 1);
+        input = getIntegerInRange(1, 7);
         return UserInput.values()[input];
     }
 
