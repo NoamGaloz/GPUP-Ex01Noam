@@ -86,7 +86,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     }
 
     @Override
-    public List<String> findPaths(String dest, TargetsRelationType type, String src) {
+    public List<String> findPaths(String src, TargetsRelationType type, String dest) {
         List<String> paths = new ArrayList<>();
         Map<String, Boolean> isVisited = new HashMap<>();
         List<String> pathList = new ArrayList<>();
@@ -128,7 +128,8 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         }
         isVisited.put(src, true);
         for (Target t : dependsOnGraph.get(src)) {
-            if (!isVisited.get(t.getName())) {
+
+             if (!isVisited.get(t.getName())) {
                 localPath.add(t.getName());
                 recFindPath(t.getName(), dest, isVisited, localPath, paths);
                 localPath.remove(t.getName());
@@ -165,12 +166,12 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     public List<String> findCircuit(String src) {
         Map<Target, Boolean> isVisited = new HashMap<>();
         List<String> circuteList = new ArrayList<>();
-        boolean foundCircuit=false;
+        boolean foundCircuit = false;
 
         targetMap.forEach((s, target) -> isVisited.put(target, false));
 
-       if(recDfsFindCircuitWithGivenTarget(isVisited,circuteList,targetMap.get(src),targetMap.get(src),foundCircuit,true))
-           return circuteList;
+        if (recDfsFindCircuitWithGivenTarget(isVisited, circuteList, targetMap.get(src), targetMap.get(src), foundCircuit, true))
+            return circuteList;
 
         return null;
     }
@@ -274,10 +275,10 @@ public class TargetGraph implements DirectableGraph, GraphActions {
 
     public List<StatisticsDTO.TargetRunDTO> getTargetsRunInfoList() {
 
-        List<StatisticsDTO.TargetRunDTO> targetsRunInfoList=new ArrayList<>();
+        List<StatisticsDTO.TargetRunDTO> targetsRunInfoList = new ArrayList<>();
 
         targetMap.forEach(((s, target) -> {
-            StatisticsDTO.TargetRunDTO targetRunDTO= new StatisticsDTO().new TargetRunDTO(s,target.getFinishResult(),target.getTaskRunDuration());
+            StatisticsDTO.TargetRunDTO targetRunDTO = new StatisticsDTO().new TargetRunDTO(s, target.getFinishResult(), target.getTaskRunDuration());
             targetsRunInfoList.add(targetRunDTO);
         }));
 
@@ -285,19 +286,19 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     }
 
 
-    private Boolean recDfsFindCircuitWithGivenTarget(Map<Target, Boolean> isVisited, List<String> circuitList, Target currentTarget,Target src,Boolean foundCirc, Boolean isFirstIter) {
+    private Boolean recDfsFindCircuitWithGivenTarget(Map<Target, Boolean> isVisited, List<String> circuitList, Target currentTarget, Target src, Boolean foundCirc, Boolean isFirstIter) {
 
         circuitList.add(currentTarget.getName());
 
         for (Target t : dependsOnGraph.get(currentTarget.getName())) {
-                if (!isFirstIter && t.equals(src)) {
-                    //foundCirc = true;
-                    circuitList.add(src.getName());
-                    return true;
-                }
-                if (!isVisited.get(t)) {
-                   return recDfsFindCircuitWithGivenTarget(isVisited, circuitList, t, src, foundCirc, false);
-                }
+            if (!isFirstIter && t.equals(src)) {
+                //foundCirc = true;
+                circuitList.add(src.getName());
+                return true;
+            }
+            if (!isVisited.get(t)) {
+                return recDfsFindCircuitWithGivenTarget(isVisited, circuitList, t, src, foundCirc, false);
+            }
         }
 
         isVisited.replace(currentTarget, false, true);

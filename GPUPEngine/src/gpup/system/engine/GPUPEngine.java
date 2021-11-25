@@ -146,7 +146,7 @@ public class GPUPEngine implements Engine {
     public PathsDTO findPaths(String src, String dest, TargetsRelationType type) {
         if (!src.equals(dest)) {
             if (targetGraph.isTargetExist(src) && targetGraph.isTargetExist(dest)) {
-                return new PathsDTO(targetGraph.findPaths(src, dest, type), src, dest, type);
+                return new PathsDTO(targetGraph.findPaths(src, type, dest ), src, dest, type);
             } else {
                 throw new NoSuchElementException("The required targets aren't exist");
             }
