@@ -1,7 +1,7 @@
 package gpup.components.target;
 
+import java.time.Duration;
 import java.util.*;
-
 
 
 public class Target {
@@ -13,10 +13,9 @@ public class Target {
     private TargetType type;
     private RunResult runResult;
     private FinishResult finishResult;
-    List<Target> justOpenedList = new ArrayList<>();
-    List<Target> skippedList = new ArrayList<>();
-
-
+    private List<Target> justOpenedList = new ArrayList<>();
+    private List<Target> skippedList = new ArrayList<>();
+    private Duration taskRunDuration;
 
     public Target(String name) {
         this.name = name;
@@ -46,6 +45,10 @@ public class Target {
         return requiredForList;
     }
 
+    public List<Target> getJustOpenedList() {
+        return justOpenedList;
+    }
+
     public List<Target> getDependsOnList() {
         return dependsOnList;
     }
@@ -56,6 +59,10 @@ public class Target {
 
     public void setUserData(String userData) {
         this.userData = userData;
+    }
+
+    public void setTaskRunDuration(Duration taskRunDuration) {
+        this.taskRunDuration = taskRunDuration;
     }
 
     public void setRunResult(RunResult runResult) {
@@ -114,8 +121,6 @@ public class Target {
             return requiredForList.contains(target);
         }
     }
-
-
 
     public List<Target> GetSkippedList() {
         return skippedList;

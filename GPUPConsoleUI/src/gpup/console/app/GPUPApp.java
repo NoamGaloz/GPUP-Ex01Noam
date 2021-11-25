@@ -1,24 +1,16 @@
 package gpup.console.app;
 
-import gpup.components.target.TargetType;
 import gpup.components.task.ProcessingStartStatus;
-import gpup.console.validation.ConsoleIOValidations;
-
 import gpup.components.target.TargetsRelationType;
-import gpup.console.validation.IOValidations;
 import gpup.dto.PathsDTO;
-import gpup.dto.ProcessedTargetDTO;
 import gpup.dto.TargetDTO;
 import gpup.system.engine.Engine;
-import gpup.system.engine.GPUPEngine;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.NoSuchElementException;
@@ -37,7 +29,7 @@ public class GPUPApp {
         GPUPConsoleIO.welcome();
 
         while (userInput != UserInput.QUIT) {
-            userInput = GPUPConsoleIO.mainMenu();
+            userInput = GPUPConsoleIO.mainMenu(); // show system menu & getting user input
             if (engine.IsInitialized() || userInput.equals(UserInput.LOAD) || userInput.equals(UserInput.QUIT)) {
                 switch (userInput) {
                     case LOAD:
@@ -53,6 +45,7 @@ public class GPUPApp {
                         findPaths();
                         break;
                     case TASK:
+                        runTask();
                         break;
                     case QUIT:
                         userInput = GPUPConsoleIO.exit();
@@ -61,8 +54,9 @@ public class GPUPApp {
             } else {
                 GPUPConsoleIO.unloadedSystem();
             }
-            GPUPConsoleIO.continueApp();
-
+            if (!userInput.equals(UserInput.QUIT)) {
+                GPUPConsoleIO.continueApp();
+            }
         }
         GPUPConsoleIO.printMsg("Goodbye!");
     }
@@ -70,10 +64,10 @@ public class GPUPApp {
     private void findPaths() {
         GPUPConsoleIO.printMsg("Please enter 2 targets by name\nFirst target (from):");
         String src = GPUPConsoleIO.getStringInput("name");
-        if (!IOValidations.isQuit(src)) {
+        if (!GPUPConsoleIO.isQuit(src)) {
             GPUPConsoleIO.printMsg("Second target (To):");
             String dest = GPUPConsoleIO.getStringInput("name");
-            if (!IOValidations.isQuit(dest)) {
+            if (!GPUPConsoleIO.isQuit(dest)) {
                 TargetsRelationType type = getRelationType();
                 if (type != null) {
                     try {
@@ -89,10 +83,7 @@ public class GPUPApp {
 
     private TargetsRelationType getRelationType() {
         TargetsRelationType type;
-        GPUPConsoleIO.printMsg("Dependency between the targets");
-        GPUPConsoleIO.printMsg("  1. Depend On");
-        GPUPConsoleIO.printMsg("  2. Required For");
-        int choice = GPUPConsoleIO.getIntegerInput();
+        int choice = GPUPConsoleIO.getTwoOptionsResult("Dependency between the targets", "Depend On", "Required For");
         switch (choice) {
             case 0:
                 return null;
@@ -114,7 +105,7 @@ public class GPUPApp {
             GPUPConsoleIO.failedLoadSystem("The file path contains invalid letters.");
             return;
         }
-        if (!IOValidations.isQuit(path)) {
+        if (!GPUPConsoleIO.isQuit(path)) {
             try {
 
                 if (!Files.exists(Paths.get(path))) {
@@ -142,7 +133,7 @@ public class GPUPApp {
         do {
             GPUPConsoleIO.targetNameRequest();
             String name = GPUPConsoleIO.getStringInput("name");
-            if (IOValidations.isQuit(name)) {
+            if (GPUPConsoleIO.isQuit(name)) {
                 break;
             }
             try {
@@ -155,128 +146,36 @@ public class GPUPApp {
         } while (!targetExist);
     }
 
-
     private void showTargetsGraphInfo() {
-
-        //GPUPConsoleIO.showTargetsCount(engine.getTotalTargetsNumber());
         GPUPConsoleIO.printMsg(engine.getGraphInfo().toString());
-//        GPUPConsoleIO.showTargetCountByType(TargetType.Independent, engine.getSpecificTypeOfTargetsNum(TargetType.Independent));
-//        GPUPConsoleIO.showTargetCountByType(TargetType.Leaf, engine.getSpecificTypeOfTargetsNum(TargetType.Leaf));
-//        GPUPConsoleIO.showTargetCountByType(TargetType.Middle, engine.getSpecificTypeOfTargetsNum(TargetType.Middle));
-//        GPUPConsoleIO.showTargetCountByType(TargetType.Root, engine.getSpecificTypeOfTargetsNum(TargetType.Root));
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private void runTask(){
-
-        int targetProccesingTime = GPUPConsoleIO.getProccesingTime();
-        int taskProcossingTimeType  = GPUPConsoleIO.getOptionsInfo("Do you want Processing Time will be :", "1. Random (limited by the processing time you entered)", "2. Excactly the processing time you entered");
-        float succesProb = GPUPConsoleIO.getTargetCompleteProb("Enter the probability of single target run task, to complete with SUCCES");
-        float ifSucces_withWarningsProb = GPUPConsoleIO.getTargetCompleteProb("Assuming the task completed with SUCCUES, Enter the probability it will be WITH WARNINGS");
-        int howToStart = GPUPConsoleIO.getOptionsInfo("Do you want to start processing :", "1. From Scratch", "2. Incremental (only non-succeded targets)");
-
-        engine.InitTask(targetProccesingTime,taskProcossingTimeType,succesProb,ifSucces_withWarningsProb);
-
-        ProcessingStartStatus procStartStatus = howToStart==1 ? ProcessingStartStatus.FromScratch : ProcessingStartStatus.Incremental;
-
+    private void runTask() {
+        int targetProcessingTime = GPUPConsoleIO.getProcessingTime();
+        int taskProcessingTimeType = GPUPConsoleIO.getTwoOptionsResult("Do you want Processing Time will be :", "1. Random (limited by the processing time you entered)", "2. Excactly the processing time you entered");
+        float successProb = GPUPConsoleIO.getProbability("Enter the probability of single target run task, to complete with SUCCESS");
+        float successWithWarningsProb = GPUPConsoleIO.getProbability("Assuming the task completed with SUCCUES, Enter the probability it will be WITH WARNINGS");
+        int howToStart = GPUPConsoleIO.getTwoOptionsResult("Do you want to start processing :", "From Scratch", "Incremental (only non-succeeded targets)");
+        ProcessingStartStatus procStartStatus = howToStart == 1 ? ProcessingStartStatus.FromScratch : ProcessingStartStatus.Incremental;
+
+        if ((procStartStatus.equals(ProcessingStartStatus.Incremental) && engine.isFirstTaskRun())) {
+            GPUPConsoleIO.printMsg("The task will run 'From Scratch' even though you choose 'Incremental'.\nBecause this is the first run.\n");
+            procStartStatus = ProcessingStartStatus.FromScratch;
+        }
+
+        engine.InitTask(targetProcessingTime, taskProcessingTimeType, successProb, successWithWarningsProb, procStartStatus);
         engine.SetProcessingStartStatus(procStartStatus);
 
-        engine.RunTask();
+        try {
+            engine.RunTask(new GPUPConsumer());
+
+        } catch (InterruptedException e) {
+            GPUPConsoleIO.printMsg("There have been a problem with 'Thread.sleep' function.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (RuntimeException e) {
+            GPUPConsoleIO.printMsg(e.getMessage());
+        }
     }
-
-
 }
 

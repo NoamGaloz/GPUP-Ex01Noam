@@ -1,25 +1,12 @@
 package gpup.console.app;
 
 import gpup.components.target.TargetType;
-import gpup.components.task.simulation.ProcessingTimeType;
-import gpup.console.validation.ConsoleIOValidations;
-
-import gpup.console.validation.IOValidations;
-import gpup.dto.ProcessedTargetDTO;
 import gpup.dto.TargetDTO;
-import sun.security.pkcs11.wrapper.CK_SSL3_KEY_MAT_OUT;
 
 import java.util.InputMismatchException;
-import java.util.Random;
 import java.util.Scanner;
-import java.util.function.Consumer;
 
-
-public class GPUPConsoleIO implements Consumer<ProcessedTargetDTO> {
-    @Override
-    public void accept(ProcessedTargetDTO processedTarget) {
-        System.out.println(processedTarget.getName());
-    }
+public class GPUPConsoleIO {
 
     public static void welcome() {
         System.out.println("Hello and welcome to G.P.U.P - Generic system for streamlining and improving processes");
@@ -27,16 +14,33 @@ public class GPUPConsoleIO implements Consumer<ProcessedTargetDTO> {
 
     public static UserInput mainMenu() {
         int input;
+        boolean validRange = false;
+
         System.out.println("\n=========== G.P.U.P System ===========");
         System.out.println(" 1. Load GPUP system file\n" +
                 " 2. Display Target-Graph information\n" +
                 " 3. Display target information\n" +
                 " 4. Find dependency between 2 targets\n" +
                 " 5. Run a task\n" +
-                " 6. Exit");
-        System.out.println("(-- At each stage of the program, pressing '0' will return you to the main menu --)\n");
-        input = getIntegerInput();
+                " 6. Exit\n");
+        System.out.println("(-- At each stage of the program, pressing '0' will return you to the main menu --)");
+        input = getIntegerInRange(7, 1);
         return UserInput.values()[input];
+    }
+
+    private static int getIntegerInRange(int startRange, int endRange) {
+        boolean validRange = false;
+        int input;
+        do {
+            input = getIntegerInput();
+            if (input >= startRange && input <= endRange) {
+                validRange = true;
+            } else {
+                System.out.println("Wrong input - you entered a invalid choice.");
+            }
+        } while (!validRange);
+
+        return input;
     }
 
     public static int getIntegerInput() {
@@ -56,12 +60,6 @@ public class GPUPConsoleIO implements Consumer<ProcessedTargetDTO> {
                 System.out.println("Wrong input - this is not a number, try again.");
                 validInput = false;
                 scanner.nextLine();
-            }
-            if (validInput) {
-                validInput = IOValidations.integerRangeCheck(value);
-                if (!validInput) {
-                    System.out.println("Wrong input - please enter a valid number.");
-                }
             }
         } while (!validInput);
 
@@ -102,19 +100,11 @@ public class GPUPConsoleIO implements Consumer<ProcessedTargetDTO> {
     }
 
     public static void successLoading() {
-        System.out.println("The File loaded successfully!\n");
+        System.out.println("The File loaded successfully!");
     }
 
     public static void targetNameRequest() {
         System.out.println("Please enter a target's name: (to return to the main menu, press '0')");
-    }
-
-    public static void showTargetsCount(int totalTargetsNumber) {
-        System.out.println("There Are " + totalTargetsNumber + " Targets In The System.\n");
-    }
-
-    public static void showTargetCountByType(TargetType targetType, int specificTypeOfTargetsNum) {
-        System.out.println("There Are " + specificTypeOfTargetsNum + " " + targetType.name() + " Targets In The System.");
     }
 
     public static void printMsg(String s) {
@@ -129,180 +119,63 @@ public class GPUPConsoleIO implements Consumer<ProcessedTargetDTO> {
         System.out.println(targetDTO.toString());
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public static int getProccesingTime() {
-        Scanner scanner = new Scanner(System.in);
-        int processingTime=0;
-        boolean validInput=false;
-
-        while(!validInput) {
-            try{
-            System.out.println("Please Enter The Task Processing Time (for single target) in ms : ");
-            processingTime = scanner.nextInt();
-                validInput=true;
-        }
-            catch(Exception e){
-                System.out.println("Wrong Input - you must enter an integer. ");
-                validInput=false;
-            }
-        }
-
-        return  processingTime;
+    public static int getProcessingTime() {
+        int processingTime;
+        System.out.println("Please Enter The Task Processing Time (for single target) in ms : ");
+        processingTime = getIntegerInput();
+        return processingTime;
     }
 
-    public static int getOptionsInfo(String msg,String firstOpt, String secondOpt) {
-        Scanner scanner = new Scanner(System.in);
-        int processingTime=0;
-        boolean validInput=false;
-
-        while(!validInput) {
-            try{
-                System.out.println(msg);
-                System.out.println(firstOpt);
-                System.out.println(secondOpt);
-                System.out.println("Please Enter your Choise: ( 1 or 2 )");
-                processingTime = scanner.nextInt();
-                validInput=true;
-            }
-            catch(Exception e){
-                System.out.println("Wrong Input - you must enter an integer. ");
-            }
-            if(validInput){
-                validInput = processingTime==2 | processingTime==1 ? true : false;
-                
-                if(!validInput)
-                     System.out.println("Wrong Input - you must enter 1 or 2. ");
-            }
-        }
-
-        return  processingTime;
+    public static int getTwoOptionsResult(String msg, String firstOpt, String secondOpt) {
+        System.out.println(msg);
+        System.out.println("  1. " + firstOpt);
+        System.out.println("  2. " + secondOpt);
+        int choice = getIntegerInRange(1, 2);
+        return choice;
     }
 
-    public static float getTargetCompleteProb(String msg) {
+    public static float getFloatInRange(int startRange, int endRange) {
         Scanner scanner = new Scanner(System.in);
-        float succesProb=0;
-        boolean validInput=false;
+        float value = 0;
+        boolean validInput = false;
 
-        while(!validInput) {
-            try{
-                System.out.println(msg);
-                System.out.println("A floating point number between 0 to 1");
-                succesProb = scanner.nextFloat();
-                validInput=true;
+        do {
+            System.out.print("Enter a float number between " + startRange + " to " + endRange + " (included):");
+            try {
+                value = scanner.nextFloat();
+                if (value >= startRange && value <= endRange) {
+                    validInput = true;
+                } else {
+                    System.out.println("The number is out of range");
+                }
+            } catch (InputMismatchException ex) {
+                System.out.println("Wrong input - this is not a float number, try again.");
+                scanner.nextLine();
             }
-            catch(Exception e){
-                System.out.println("Wrong Input - you must enter a floating point number. ");
-            }
-            if(validInput){
-                validInput = succesProb>=0&&succesProb<=1 ? true : false;
+        } while (!validInput);
 
-                if(!validInput)
-                    System.out.println("Wrong Input - you must enter a number between 0 to 1. ");
-            }
-        }
+        return value;
+    }
 
-        return  succesProb;
-        }
+    public static float getProbability(String msg) {
+        System.out.println(msg);
+        return getFloatInRange(0, 1);
+    }
+
     public static void continueApp() {
-        System.out.println("Press ENTER to continue ...");
+        System.out.print("\nPress ENTER to continue ...");
         Scanner scanner = new Scanner(System.in);
         scanner.nextLine();
+    }
+
+
+    public static boolean isQuit(String name) {
+        final String QUIT = "0";
+        if (name.equals(QUIT)) {
+            GPUPConsoleIO.printMsg("Going back to main menu.");
+            return true;
+        }
+        return false;
     }
 
     public static UserInput exit() {

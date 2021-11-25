@@ -20,7 +20,6 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     private List<Target> leavesList;
 
 
-
     public TargetGraph(String name) {
         this.name = name;
         dependsOnGraph = new HashMap<>();
@@ -173,34 +172,6 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         return 0;
     }
 
-   
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     public int getSpecificTypeOfTargetsNum(TargetType targetType) {
         return (int) targetMap.values()
@@ -218,63 +189,37 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @Override
     public void buildTransposeGraph() {
-        gTranspose=new HashMap<>();
+        gTranspose = new HashMap<>();
         if (dependsOnGraph.size() != 0) {
-            targetMap.forEach(((s, target) -> gTranspose.put(s,new ArrayList<>())));
+            targetMap.forEach(((s, target) -> gTranspose.put(s, new ArrayList<>())));
             dependsOnGraph.forEach((s, targets) -> {
-             targets.forEach(target -> {
-                 gTranspose.get(target.getName()).add(targetMap.get(s));
-             });
-          });
+                targets.forEach(target -> {
+                    gTranspose.get(target.getName()).add(targetMap.get(s));
+                });
+            });
         }
     }
 
-    public Map<String, List<Target>> GetGraph(){
+    public Map<String, List<Target>> GetGraph() {
         return dependsOnGraph;
     }
 
 
     public List<Target> getAllWaitingTargets() {
-       List<Target> resList= new ArrayList<>();
-       targetMap.forEach(((s, target) -> {if(target.getRunResult()==RunResult.WAITING){resList.add(target);}}));
-       return resList;
+        List<Target> resList = new ArrayList<>();
+        targetMap.forEach(((s, target) -> {
+            if (target.getRunResult().equals(RunResult.WAITING)) {
+                resList.add(target);
+            }
+        }));
+        return resList;
     }
 
-    public void updateLeavesAndIndepdentsToWaiting(){
+    public void updateLeavesAndIndepdentsToWaiting() {
         targetMap.forEach(((s, target) -> {
-            if(target.getType()==TargetType.Leaf || target.getType() == TargetType.Independent){
+            if (target.getType() == TargetType.Leaf || target.getType() == TargetType.Independent) {
                 target.setRunResult(RunResult.WAITING);
             }
         }));
@@ -285,9 +230,11 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         for (Target target : gTranspose.get(currentTarget.getName())) {
             if (target.isAllAdjFinishedWithoutFailure()) {
                 target.setRunResult(RunResult.WAITING);
-                if(!waitingList.contains(target))
+                if (!waitingList.contains(target))
                     waitingList.add(target);
             }
+            if (target.isAllAdjFinished())
+                currentTarget.AddToJustOpenedList(target);
         }
     }
 
@@ -302,9 +249,9 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     public void DfsTravelToUpdateSkippedList(Target currentTarget) {
 
         Map<Target, Boolean> isVisited = new HashMap<>();
-        targetMap.forEach(((s, target) -> isVisited.put(target,false)));
-        List<Target> skippedList =currentTarget.GetSkippedList();
-        recDfsUpdateSkippedList(isVisited, skippedList ,currentTarget);
+        targetMap.forEach(((s, target) -> isVisited.put(target, false)));
+        List<Target> skippedList = currentTarget.GetSkippedList();
+        recDfsUpdateSkippedList(isVisited, skippedList, currentTarget);
         skippedList.remove(currentTarget);
     }
 
@@ -313,10 +260,10 @@ public class TargetGraph implements DirectableGraph, GraphActions {
 
         for (Target t : gTranspose.get(currentTarget.getName())) {
             if (!isVisited.get(t)) {
-                recDfsUpdateSkippedList(isVisited,skippedList,t);
+                recDfsUpdateSkippedList(isVisited, skippedList, t);
             }
         }
-        isVisited.replace(currentTarget,false,true);
+        isVisited.replace(currentTarget, false, true);
     }
 
     private void updateTargetsFromScratch() {
@@ -328,26 +275,27 @@ public class TargetGraph implements DirectableGraph, GraphActions {
 
     private void updateTargetIncremental() {
         targetMap.forEach(((s, target) -> {
-            if(target.getRunResult().equals(RunResult.FINISHED)){
-            if(target.getFinishResult().equals(FinishResult.FAILURE)) {
-                target.setFinishResult(null);
-                target.setRunResult(RunResult.WAITING);
-            }}
-            if(target.getRunResult().equals(RunResult.SKIPPED))
+            if (target.getRunResult().equals(RunResult.FINISHED)) {
+                if (target.getFinishResult().equals(FinishResult.FAILURE)) {
+                    target.setFinishResult(null);
+                    target.setRunResult(RunResult.WAITING);
+                }
+            }
+            if (target.getRunResult().equals(RunResult.SKIPPED))
                 target.setRunResult(RunResult.FROZEN);
         }));
     }
 
-    public void PrepareGraphAccordingToProcessingStartStatus(ProcessingStartStatus processingStartStatus,boolean isFirstRunTask) {
-        if(isFirstRunTask){
+    public void PrepareGraphAccordingToProcessingStartStatus(ProcessingStartStatus processingStartStatus, boolean isFirstRunTask) {
+        if (isFirstRunTask) {
             updateLeavesAndIndepdentsToWaiting();
-        if(processingStartStatus == ProcessingStartStatus.Incremental)
-           ; ///////TellUserItsactualyFromScrath
-        }
-        else//notFirstRunTask
+//            if (processingStartStatus == ProcessingStartStatus.Incremental) {
+//                ; ///////Tell User It's actually From Scrath
+//            }
+        } else//not First Run Task
         {
-            if(processingStartStatus == ProcessingStartStatus.Incremental)
-                                             updateTargetIncremental();
+            if (processingStartStatus == ProcessingStartStatus.Incremental)
+                updateTargetIncremental();
             else {
                 updateTargetsFromScratch();
                 updateLeavesAndIndepdentsToWaiting();

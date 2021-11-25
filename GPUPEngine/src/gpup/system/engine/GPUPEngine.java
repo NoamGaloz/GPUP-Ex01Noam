@@ -12,8 +12,7 @@ import gpup.components.task.Task;
 
 import gpup.components.task.simulation.ProcessingTimeType;
 import gpup.components.task.simulation.SimulationTask;
-import gpup.dto.TargetDTO;
-import gpup.dto.TargetGraphDTO;
+import gpup.dto.*;
 import gpup.exceptions.TargetExistException;
 import gpup.jaxb.schema.generated.GPUPDescriptor;
 import gpup.jaxb.schema.parser.GPUPParser;
@@ -25,18 +24,16 @@ import javax.xml.bind.Unmarshaller;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.rmi.RemoteException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.NoSuchElementException;
-
-
+import java.util.function.Consumer;
 
 
 // IMPLEMENT INTERFACE
@@ -44,8 +41,8 @@ public class GPUPEngine implements Engine {
     private TargetGraph targetGraph;
     private Task task; // can it run several tasks?
     private ProcessingStartStatus processingStartStatus;
-    private boolean isFirstRunTask = true;
-
+    //    private boolean isFirstRunTask = true;
+    private Duration totalRunDuration;
 
 
     public GPUPEngine() {
@@ -97,223 +94,72 @@ public class GPUPEngine implements Engine {
         return targetGraph.getSpecificTypeOfTargetsNum(targetType);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @Override
-    public void InitTask(int targetProccesingTimeMs,int taskProcossingTimeType,float succesProb,float ifSucces_withWarningsProb)
-    {
-        ProcessingTimeType procTimeType = taskProcossingTimeType == 1 ? ProcessingTimeType.Random : ProcessingTimeType.Permanent;
-        task = new SimulationTask("TARGETNAME",procTimeType, succesProb, ifSucces_withWarningsProb, targetProccesingTimeMs);
-    }
-
-@Override
-    public void SetProcessingStartStatus(ProcessingStartStatus processingStartStatus) {
-        this.processingStartStatus = processingStartStatus;
+    public void InitTask(int targetProcessingTimeMs, int taskProcessingTimeType, float successProb, float successWithWarningsProb, ProcessingStartStatus status) {
+        ProcessingTimeType procTimeType = taskProcessingTimeType == 1 ? ProcessingTimeType.Random : ProcessingTimeType.Permanent;
+        task = new SimulationTask(targetGraph.getName(), procTimeType, successProb, successWithWarningsProb, targetProcessingTimeMs);
     }
 
     @Override
-    public void RunTask(){
+    public void SetProcessingStartStatus(ProcessingStartStatus status) {
+        this.processingStartStatus = status;
+    }
+
+    @Override
+    public void RunTask(Consumer<ConsumerDTO> consumer) throws InterruptedException, IOException {
 
         String output;
-        Instant start, end;
-        Duration singleTargetRunDuration;
-        long sleepingTime=0;
+        Instant totalStart, totalEnd, start, end;
         List<Target> waitingList;
-        targetGraph.PrepareGraphAccordingToProcessingStartStatus(processingStartStatus, isFirstRunTask);
+
+        targetGraph.PrepareGraphAccordingToProcessingStartStatus(processingStartStatus, processingStartStatus == ProcessingStartStatus.FromScratch);
         targetGraph.buildTransposeGraph();
         targetGraph.clearAllTargetsHelpingLists();
         waitingList = targetGraph.getAllWaitingTargets();
 
-        try {
+        totalStart = Instant.now();
+        String dirPath = createDirectoryName();
+        createTaskDirectory(dirPath);
+        task.setDirectoryPath(dirPath);
 
-            while (!waitingList.isEmpty()) {
-                Target currentTarget = waitingList.remove(0);
-                currentTarget.setRunResult(RunResult.INPROCCESS);
-                sleepingTime = (long) task.GetSingleTargetProcessingTimeInMs();
+        if (waitingList.isEmpty() && processingStartStatus.equals(ProcessingStartStatus.Incremental)) {
+            throw new RuntimeException("The graph already had been processed completely, there is no need for 'Incremental' action");
+        }
 
-                output = "Task START running on Target " + currentTarget.getName() + "\n";
-                output += currentTarget.getUserData() + "\n";
-                output += "The predicted sleeping time is : " + sleepingTime + "\n";
-                output += "Target " + currentTarget.getName() + " is about to sleep" + "\n";
-                start = Instant.now();
-                Thread.sleep(sleepingTime);
-                end = Instant.now();
-                singleTargetRunDuration = Duration.between(start, end);
-                output += "Target " + currentTarget.getName() + " just woke up" + "\n";
-                output += "Task END running on Target " + currentTarget.getName() + "\n";
+        while (!waitingList.isEmpty()) {
+            start = Instant.now();
+            Target currentTarget = waitingList.remove(0);
+            currentTarget.setRunResult(RunResult.INPROCCESS);
 
-                currentTarget.setFinishResult(task.run());
-                currentTarget.setRunResult(RunResult.FINISHED);
+            currentTarget.setFinishResult(task.run());
+            currentTarget.setRunResult(RunResult.FINISHED);
 
-                output += "Target finished with " + currentTarget.getFinishResult();
-
-                if (currentTarget.getFinishResult() == FinishResult.FAILURE) {
-                    targetGraph.DfsTravelToUpdateSkippedList(currentTarget);
-                    targetGraph.UpdateTargetAdjAfterFinishWithFailure(currentTarget);
-                } else {
-                    targetGraph.UpdateTargetAdjAfterFinishWithoutFailure(waitingList,currentTarget);
-                }
-
-                /////to enter document
-
-         //       if(!justOpenedList.isEmpty())
-         //           output+= "\nTargets that -just opened- :" + printList(justOpenedList);
-
-          //      if (!skippedList.isEmpty())
-          //          output+= "\nTargets that lost their chance to run :" + printList(skippedList);
-                /////to enter document
-
-                System.out.println(output);
+            if (currentTarget.getFinishResult() == FinishResult.FAILURE) {
+                targetGraph.DfsTravelToUpdateSkippedList(currentTarget);
+                targetGraph.UpdateTargetAdjAfterFinishWithFailure(currentTarget);
+            } else {
+                targetGraph.UpdateTargetAdjAfterFinishWithoutFailure(waitingList, currentTarget);
             }
+            end = Instant.now();
+            currentTarget.setTaskRunDuration(Duration.between(start, end));
+
+            ConsumerDTO consumerDTO = new ProcessedTargetDTO(currentTarget);
+            consumerDTO.setTaskOutput(new SimulationOutputDTO(task.getProcessingTime()));
+            //Writing to file
+            writeTargetToFile(start, end, consumerDTO, task.getDirectoryPath());
+            // calling to consumer.accept
+            consumer.accept(consumerDTO);
         }
-            catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+        totalEnd = Instant.now();
+        totalRunDuration = Duration.between(totalStart, totalEnd);
+        // StatDTO statisticsDTO = calcStatistics();
+        // consumer.accept(statisticsDTO);
+
+
     }
 
-    private String printList(List<Target> justOpenedList) {
-        String res = "";
-        for(Target t: justOpenedList){
-            res += "\n"+t.getName();
-        }
-       // justOpenedList.forEach((target ->{res += "\n"+target.getName();}));
-        return res;
 
-      
     @Override
     public PathsDTO findPaths(String src, String dest, TargetsRelationType type) {
         if (!src.equals(dest)) {
@@ -327,13 +173,16 @@ public class GPUPEngine implements Engine {
         }
     }
 
-    @Override
-    public void createTaskDirectory() {
-        final String PATH = "GPUPEngine/src/tasks/directories/";
+    private String createDirectoryName() {
+        String path = targetGraph.getWorkingDirectory() + "/";
         String creationTime = new SimpleDateFormat("dd.MM.yyyy HH.mm.ss").format(Calendar.getInstance().getTime());
-        String dirName = PATH + "SimTaskName" + " - " + creationTime;
-        //task.setDirectoryName(dirName);
-        File taskDirectory = new File(dirName);
+        path = path + targetGraph.getName() + " - " + creationTime;
+        return path;
+    }
+
+    @Override
+    public void createTaskDirectory(String path) {
+        File taskDirectory = new File(path);
         if (!taskDirectory.exists()) {
             if (!taskDirectory.mkdir()) {
                 throw new RuntimeException("Failure with creating the Task's Directory");
@@ -341,15 +190,23 @@ public class GPUPEngine implements Engine {
         }
     }
 
-    private void writeTargetToFile(Instant start, Instant end, long sleepTime, Target target) throws IOException {
+    @Override
+    public boolean isFirstTaskRun() {
+        return task == null;
+    }
+
+    private void writeTargetToFile(Instant start, Instant end, ConsumerDTO target, String path) throws IOException {
         String fileName = target.getName() + ".log";
         Writer out = null;
         try {
             out = new BufferedWriter(
                     new OutputStreamWriter(
-                            new FileOutputStream("dirname" + "/" + fileName))); // task.getDirName()
+                            new FileOutputStream(path + "/" + fileName))); // task.getDirName()
             // write to file:
-            out.write("BLABKABKAB");
+            out.write(start.toString());
+            out.write(target.toString());
+            out.write(end.toString());
+
 
         } finally {
             if (out != null) {
