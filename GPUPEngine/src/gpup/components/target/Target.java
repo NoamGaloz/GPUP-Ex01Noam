@@ -24,7 +24,6 @@ public class Target {
         runResult = RunResult.FROZEN;
     }
 
-    // Setters & Getters:
     public String getName() {
         return name;
     }
@@ -77,7 +76,6 @@ public class Target {
         this.type = type;
     }
 
-    // Methods:
     public boolean isAllAdjFinished() {
         return dependsOnList.stream().allMatch(target -> target.getRunResult().equals(RunResult.FINISHED));
     }
@@ -100,19 +98,6 @@ public class Target {
             requiredForList.add(target);
         }
     }
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        Target target = (Target) o;
-//        return name.equals(target.name) && Objects.equals(requiredForList, target.requiredForList) && Objects.equals(dependsOnList, target.dependsOnList) && type == target.type;
-//    }
-
-//    @Override
-//    pub lic int hashCode() {
-//        return Objects.hash(name, requiredForList, dependsOnList, type, runResult, finishResult);
-//    }
 
     public boolean isDependency(Target target, String type) {
         if (type.equals("dependsOn")) {

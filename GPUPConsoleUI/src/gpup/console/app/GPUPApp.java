@@ -2,6 +2,7 @@ package gpup.console.app;
 
 import gpup.components.task.ProcessingStartStatus;
 import gpup.components.target.TargetsRelationType;
+import gpup.dto.CircuitDTO;
 import gpup.dto.PathsDTO;
 import gpup.dto.TargetDTO;
 import gpup.system.engine.Engine;
@@ -48,7 +49,7 @@ public class GPUPApp {
                         runTask();
                         break;
                     case CIRCUIT:
-                     // //  findCircuit();
+                        findCircuit();
                         break;
                     case QUIT:
                         userInput = GPUPConsoleIO.exit();
@@ -63,7 +64,19 @@ public class GPUPApp {
         }
         GPUPConsoleIO.printMsg("Goodbye!");
     }
-
+    private void findCircuit() {
+        GPUPConsoleIO.printMsg("Please enter a target name to see if it is part of a Circuit: ");
+        String name = GPUPConsoleIO.getStringInput("name");
+        if(!GPUPConsoleIO.isQuit(name)){
+            try {
+                CircuitDTO circuit = engine.findCircuit(name);
+                GPUPConsoleIO.printMsg(circuit.toString());
+            }catch (NoSuchElementException e)
+            {
+                GPUPConsoleIO.printMsg(e.getMessage());
+            }
+        }
+    }
 
     private void findPaths() {
         GPUPConsoleIO.printMsg("Please enter 2 targets by name\nFirst target (from):");
@@ -156,7 +169,7 @@ public class GPUPApp {
 
     private void runTask() {
         int targetProcessingTime = GPUPConsoleIO.getProcessingTime();
-        int taskProcessingTimeType = GPUPConsoleIO.getTwoOptionsResult("Do you want Processing Time will be :", "1. Random (limited by the processing time you entered)", "2. Excactly the processing time you entered");
+        int taskProcessingTimeType = GPUPConsoleIO.getTwoOptionsResult("Do you want Processing Time will be :", "Random (limited by the processing time you entered)", "Excactly the processing time you entered");
         float successProb = GPUPConsoleIO.getProbability("Enter the probability of single target run task, to complete with SUCCESS");
         float successWithWarningsProb = GPUPConsoleIO.getProbability("Assuming the task completed with SUCCUES, Enter the probability it will be WITH WARNINGS");
         int howToStart = GPUPConsoleIO.getTwoOptionsResult("Do you want to start processing :", "From Scratch", "Incremental (only non-succeeded targets)");

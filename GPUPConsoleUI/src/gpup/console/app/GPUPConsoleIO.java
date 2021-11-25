@@ -1,8 +1,6 @@
 package gpup.console.app;
 
-import gpup.components.target.TargetType;
 import gpup.dto.TargetDTO;
-
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -14,16 +12,16 @@ public class GPUPConsoleIO {
 
     public static UserInput mainMenu() {
         int input;
-        boolean validRange = false;
-
         System.out.println("\n=========== G.P.U.P System ===========");
         System.out.println(" 1. Load GPUP system file\n" +
                 " 2. Display Target-Graph information\n" +
                 " 3. Display target information\n" +
                 " 4. Find dependency between 2 targets\n" +
                 " 5. Run a task\n" +
-                " 6. Exit\n");
+                " 6. Find Circuit\n" +
+                " 7. Exit\n");
         System.out.println("(-- At each stage of the program, pressing '0' will return you to the main menu --)");
+        System.out.print("Please choose an option: ");
         input = getIntegerInRange(1, 7);
         return UserInput.values()[input];
     }
@@ -36,7 +34,7 @@ public class GPUPConsoleIO {
             if (input >= startRange && input <= endRange) {
                 validRange = true;
             } else {
-                System.out.println("Wrong input - you entered a invalid choice.");
+                System.out.println("Wrong input - you entered a invalid choice, try again: ");
             }
         } while (!validRange);
 
@@ -49,7 +47,6 @@ public class GPUPConsoleIO {
         boolean validInput;
 
         do {
-            System.out.print("Please choose an option: ");
             try {
                 value = scanner.nextInt();
                 if (value == 0) { // quit
@@ -57,7 +54,7 @@ public class GPUPConsoleIO {
                 }
                 validInput = true;
             } catch (InputMismatchException ex) {
-                System.out.println("Wrong input - this is not a number, try again.");
+                System.out.println("Wrong input - this is not a number, try again:");
                 validInput = false;
                 scanner.nextLine();
             }
@@ -73,6 +70,9 @@ public class GPUPConsoleIO {
         if (path.matches(".*[א-ת]+.*")) {
             return null;
         }
+        if (path.equals("0")) {
+            return UserInput.QUIT.toString();
+        }
         return path;
     }
 
@@ -84,6 +84,9 @@ public class GPUPConsoleIO {
             try {
                 input = scanner.nextLine();
                 valid = true;
+                if(input.equals("0")){
+                    input = UserInput.QUIT.toString();
+                }
             } catch (Exception ex) {
                 System.out.println("Wrong input - this is not a valid " + msg + ", try again.");
                 valid = false;
@@ -130,8 +133,7 @@ public class GPUPConsoleIO {
         System.out.println(msg);
         System.out.println("  1. " + firstOpt);
         System.out.println("  2. " + secondOpt);
-        int choice = getIntegerInRange(1, 2);
-        return choice;
+        return getIntegerInRange(1, 2);
     }
 
     public static float getFloatInRange(int startRange, int endRange) {
@@ -170,8 +172,7 @@ public class GPUPConsoleIO {
 
 
     public static boolean isQuit(String name) {
-        final String QUIT = "0";
-        if (name.equals(QUIT)) {
+        if (name.equals(UserInput.QUIT.toString())) {
             GPUPConsoleIO.printMsg("Going back to main menu.");
             return true;
         }

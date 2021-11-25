@@ -26,9 +26,7 @@ public class ProcessedTargetDTO implements ConsumerDTO {
             return "None";
         } else {
             StringBuilder str = new StringBuilder();
-            list.forEach(target -> {
-                str.append(target.getName() + ",");
-            });
+            list.forEach(target -> str.append(target.getName()).append(","));
             str.deleteCharAt(str.length() - 1);
             return str.toString();
         }
@@ -47,17 +45,17 @@ public class ProcessedTargetDTO implements ConsumerDTO {
     @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
-        output.append("START process target: " + name + "\n");
+        output.append("START process target: ").append(name).append("\n");
         output.append(taskOutput.toString());
-        output.append("Target Data:\n   " + userData + "\n");
-        output.append("FINISH process target: " + name + "\n");
+        output.append("Target Data:\n   ").append(userData).append("\n");
+        output.append("FINISH process target: ").append(name).append("\n");
         if (finishResult.equals(FinishResult.WARNING)) {
-            output.append("Target -" + name + "- finished with: SUCCESS WITH " + finishResult + "\n");
+            output.append("Target -").append(name).append("- finished with: SUCCESS WITH ").append(finishResult).append("\n");
         } else {
-            output.append("Target -" + name + "- finished with: " + finishResult + "\n");
+            output.append("Target -").append(name).append("- finished with: ").append(finishResult).append("\n");
         }
-        output.append("Targets that just opened: " + justOpenedList + "\n");
-        output.append("Targets that had lost their chance to run: " + justSkippedList + "\n");
+        output.append("Targets that just opened: ").append(justOpenedList).append("\n");
+        output.append("Targets that had lost their chance to run: ").append(justSkippedList).append("\n");
         output.append("---------------------------------");
 
         return output.toString();

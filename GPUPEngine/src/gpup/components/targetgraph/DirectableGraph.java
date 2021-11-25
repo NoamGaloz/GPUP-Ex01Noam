@@ -1,13 +1,12 @@
 package gpup.components.targetgraph;
+
+import java.util.List;
+
 // לשנות שם?
 public interface DirectableGraph {
 
-    void buildSuperGraph();
-
-    int getConnectedComponentsCount();
-
     void buildTransposeGraph();
 
-    //boolean isCircuit();
+    List<String> findCircuit(String src);
 
 }
