@@ -1,7 +1,7 @@
-package gpup.components.targetgraph;
+package gpup.component.targetgraph;
 
-import gpup.components.target.*;
-import gpup.components.task.ProcessingStartStatus;
+import gpup.component.target.*;
+import gpup.component.task.ProcessingType;
 import gpup.dto.StatisticsDTO;
 import gpup.dto.TargetDTO;
 
@@ -42,7 +42,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
             targetMap.put(target.getName(), target);
         });
         targetMap.values().forEach(target -> target.getDependsOnList().forEach(target1 -> addEdge(target.getName(), target1)));
-        updateLeavesAndIndepedentsToWaiting();
+        updateLeavesAndIndependentsToWaiting();
     }
 
     @Override
@@ -129,7 +129,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         isVisited.put(src, true);
         for (Target t : dependsOnGraph.get(src)) {
 
-             if (!isVisited.get(t.getName())) {
+            if (!isVisited.get(t.getName())) {
                 localPath.add(t.getName());
                 recFindPath(t.getName(), dest, isVisited, localPath, paths);
                 localPath.remove(t.getName());
@@ -165,13 +165,11 @@ public class TargetGraph implements DirectableGraph, GraphActions {
     @Override
     public List<String> findCircuit(String src) {
         Map<Target, Boolean> isVisited = new HashMap<>();
-        List<String> circuteList = new ArrayList<>();
-        boolean foundCircuit = false;
+        List<String> circuitList = new ArrayList<>();
 
         targetMap.forEach((s, target) -> isVisited.put(target, false));
-
-        if (recDfsFindCircuitWithGivenTarget(isVisited, circuteList, targetMap.get(src), targetMap.get(src), foundCircuit, true))
-            return circuteList;
+        if (recDfsFindCircuitWithGivenTarget(isVisited, circuitList, targetMap.get(src), targetMap.get(src), false)){
+            return circuitList;}
 
         return null;
     }
@@ -186,7 +184,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         return resList;
     }
 
-    public void updateLeavesAndIndepedentsToWaiting() {
+    public void updateLeavesAndIndependentsToWaiting() {
         targetMap.forEach(((s, target) -> {
             if (target.getType() == TargetType.Leaf || target.getType() == TargetType.Independent) {
                 target.setRunResult(RunResult.WAITING);
@@ -194,37 +192,37 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         }));
     }
 
-
-    public void UpdateTargetAdjAfterFinishWithoutFailure(List<Target> waitingList, Target currentTarget) {
-        for (Target target : gTranspose.get(currentTarget.getName())) {
+    public void updateTargetAdjAfterFinishWithoutFailure(List<Target> waitingList, Target currentTarget) {
+        gTranspose.get(currentTarget.getName()).forEach(target -> {
             if (target.isAllAdjFinishedWithoutFailure()) {
                 target.setRunResult(RunResult.WAITING);
-                if (!waitingList.contains(target))
+                if (!waitingList.contains(target)) {
                     waitingList.add(target);
+                }
             }
-            if (target.isAllAdjFinished())
-                currentTarget.AddToJustOpenedList(target);
-        }
+        });
     }
 
-    public void UpdateTargetAdjAfterFinishWithFailure(Target currentTarget) {
-        for (Target target : gTranspose.get(currentTarget.getName())) {
+    public void updateTargetAdjAfterFinishWithFailure(Target currentTarget) {
+        gTranspose.get(currentTarget.getName()).forEach(target -> {
             target.setRunResult(RunResult.SKIPPED);
-            if (target.isAllAdjFinished())
-                currentTarget.AddToJustOpenedList(target);
-        }
+            if (target.isAllAdjFinished()) {
+                currentTarget.addToJustOpenedList(target);
+            }
+        });
     }
 
-    public void DfsTravelToUpdateSkippedList(Target currentTarget) {
+    public void dfsTravelToUpdateSkippedList(Target currentTarget) {
 
         Map<Target, Boolean> isVisited = new HashMap<>();
         targetMap.forEach(((s, target) -> isVisited.put(target, false)));
-        List<Target> skippedList = currentTarget.GetSkippedList();
+        List<Target> skippedList = currentTarget.getSkippedList();
         recDfsUpdateSkippedList(isVisited, skippedList, currentTarget);
         skippedList.remove(currentTarget);
     }
 
-    private void recDfsUpdateSkippedList(Map<Target, Boolean> isVisited, List<Target> skippedList, Target currentTarget) {
+    private void recDfsUpdateSkippedList(Map<Target, Boolean> isVisited, List<Target> skippedList, Target
+            currentTarget) {
         skippedList.add(currentTarget);
 
         for (Target t : gTranspose.get(currentTarget.getName())) {
@@ -255,22 +253,21 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         }));
     }
 
-    public void PrepareGraphAccordingToProcessingStartStatus(ProcessingStartStatus processingStartStatus, boolean isFirstRunTask) {
+    public void prepareGraphFromProcType(ProcessingType processingType, boolean isFirstRunTask) {
         if (isFirstRunTask) {
-            updateLeavesAndIndepedentsToWaiting();
-        } else//not First Run Task
-        {
-            if (processingStartStatus == ProcessingStartStatus.Incremental)
+            updateLeavesAndIndependentsToWaiting();
+        } else {
+            if (processingType == ProcessingType.Incremental) {
                 updateTargetIncremental();
-            else {
+            } else {
                 updateTargetsFromScratch();
-                updateLeavesAndIndepedentsToWaiting();
+                updateLeavesAndIndependentsToWaiting();
             }
         }
     }
 
-    public void clearAllTargetsHelpingLists() {
-        targetMap.forEach(((s, target) -> target.ClearHelpingLists()));
+    public void clearJustOpenAndSkippedLists() {
+        targetMap.forEach(((s, target) -> target.clearHelpingLists()));
     }
 
     public List<StatisticsDTO.TargetRunDTO> getTargetsRunInfoList() {
@@ -285,25 +282,20 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         return targetsRunInfoList;
     }
 
-
-    private Boolean recDfsFindCircuitWithGivenTarget(Map<Target, Boolean> isVisited, List<String> circuitList, Target currentTarget, Target src, Boolean foundCirc, Boolean isFirstIter) {
-
+    private Boolean recDfsFindCircuitWithGivenTarget(Map<Target, Boolean> isVisited, List<String> circuitList, Target currentTarget,Target src,Boolean foundCirc) {
         circuitList.add(currentTarget.getName());
+        isVisited.replace(currentTarget, false, true);
 
         for (Target t : dependsOnGraph.get(currentTarget.getName())) {
-            if (!isFirstIter && t.equals(src)) {
-                //foundCirc = true;
+            if (t.equals(src)) {
                 circuitList.add(src.getName());
                 return true;
             }
             if (!isVisited.get(t)) {
-                return recDfsFindCircuitWithGivenTarget(isVisited, circuitList, t, src, foundCirc, false);
+                return recDfsFindCircuitWithGivenTarget(isVisited, circuitList, t, src, foundCirc);
             }
         }
-
-        isVisited.replace(currentTarget, false, true);
         circuitList.remove(currentTarget.getName());
-
         return false;
     }
 }

@@ -1,8 +1,7 @@
-package gpup.components.target;
+package gpup.component.target;
 
 import java.time.Duration;
 import java.util.*;
-
 
 public class Target {
 
@@ -107,15 +106,15 @@ public class Target {
         }
     }
 
-    public List<Target> GetSkippedList() {
+    public List<Target> getSkippedList() {
         return skippedList;
     }
 
-    public void AddToJustOpenedList(Target target) {
+    public void addToJustOpenedList(Target target) {
         justOpenedList.add(target);
     }
 
-    public void ClearHelpingLists() {
+    public void clearHelpingLists() {
         justOpenedList.clear();
         skippedList.clear();
     }

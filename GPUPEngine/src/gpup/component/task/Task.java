@@ -1,7 +1,6 @@
-package gpup.components.task;
+package gpup.component.task;
 
-import gpup.components.target.FinishResult;
-import gpup.components.task.simulation.ProcessingTimeType;
+import gpup.component.target.FinishResult;
 
 public interface Task {
     FinishResult run() throws InterruptedException;
@@ -11,4 +10,7 @@ public interface Task {
     void setDirectoryPath(String path);
 
     long getProcessingTime();
+
+    default void updateProcessingTime() {
+    }
 }

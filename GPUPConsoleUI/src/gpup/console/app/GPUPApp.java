@@ -1,7 +1,7 @@
 package gpup.console.app;
 
-import gpup.components.task.ProcessingStartStatus;
-import gpup.components.target.TargetsRelationType;
+import gpup.component.task.ProcessingType;
+import gpup.component.target.TargetsRelationType;
 import gpup.dto.CircuitDTO;
 import gpup.dto.PathsDTO;
 import gpup.dto.TargetDTO;
@@ -31,7 +31,7 @@ public class GPUPApp {
 
         while (userInput != UserInput.QUIT) {
             userInput = GPUPConsoleIO.mainMenu(); // show system menu & getting user input
-            if (engine.IsInitialized() || userInput.equals(UserInput.LOAD) || userInput.equals(UserInput.QUIT)) {
+            if (engine.isInitialized() || userInput.equals(UserInput.LOAD) || userInput.equals(UserInput.QUIT)) {
                 switch (userInput) {
                     case LOAD:
                         loadGPUPSystem();
@@ -64,15 +64,15 @@ public class GPUPApp {
         }
         GPUPConsoleIO.printMsg("Goodbye!");
     }
+
     private void findCircuit() {
         GPUPConsoleIO.printMsg("Please enter a target name to see if it is part of a Circuit: ");
         String name = GPUPConsoleIO.getStringInput("name");
-        if(!GPUPConsoleIO.isQuit(name)){
+        if (!GPUPConsoleIO.isQuit(name)) {
             try {
                 CircuitDTO circuit = engine.findCircuit(name);
                 GPUPConsoleIO.printMsg(circuit.toString());
-            }catch (NoSuchElementException e)
-            {
+            } catch (NoSuchElementException e) {
                 GPUPConsoleIO.printMsg(e.getMessage());
             }
         }
@@ -124,7 +124,6 @@ public class GPUPApp {
         }
         if (!GPUPConsoleIO.isQuit(path)) {
             try {
-
                 if (!Files.exists(Paths.get(path))) {
                     GPUPConsoleIO.failedLoadSystem("The File you try to load is not exist.");
                     return;
@@ -155,7 +154,7 @@ public class GPUPApp {
             }
             try {
                 TargetDTO targetDTO = engine.getTargetInfo(name);
-                GPUPConsoleIO.showTargetInfo(targetDTO);
+                GPUPConsoleIO.printMsg(targetDTO.toString());
                 targetExist = true;
             } catch (NoSuchElementException e) {
                 GPUPConsoleIO.printMsg(e.getMessage());
@@ -173,18 +172,18 @@ public class GPUPApp {
         float successProb = GPUPConsoleIO.getProbability("Enter the probability of single target run task, to complete with SUCCESS");
         float successWithWarningsProb = GPUPConsoleIO.getProbability("Assuming the task completed with SUCCUES, Enter the probability it will be WITH WARNINGS");
         int howToStart = GPUPConsoleIO.getTwoOptionsResult("Do you want to start processing :", "From Scratch", "Incremental (only non-succeeded targets)");
-        ProcessingStartStatus procStartStatus = howToStart == 1 ? ProcessingStartStatus.FromScratch : ProcessingStartStatus.Incremental;
+        ProcessingType procStartStatus = howToStart == 1 ? ProcessingType.FromScratch : ProcessingType.Incremental;
 
-        if ((procStartStatus.equals(ProcessingStartStatus.Incremental) && engine.isFirstTaskRun())) {
+        if ((procStartStatus.equals(ProcessingType.Incremental) && engine.isFirstTaskRun())) {
             GPUPConsoleIO.printMsg("The task will run 'From Scratch' even though you choose 'Incremental'.\nBecause this is the first run.\n");
-            procStartStatus = ProcessingStartStatus.FromScratch;
+            procStartStatus = ProcessingType.FromScratch;
         }
 
-        engine.InitTask(targetProcessingTime, taskProcessingTimeType, successProb, successWithWarningsProb, procStartStatus);
-        engine.SetProcessingStartStatus(procStartStatus);
+        engine.initTask(targetProcessingTime, taskProcessingTimeType, successProb, successWithWarningsProb, procStartStatus);
+        engine.setProcessingType(procStartStatus);
 
         try {
-            engine.RunTask(new GPUPConsumer());
+            engine.runTask(new GPUPConsumer());
 
         } catch (InterruptedException e) {
             GPUPConsoleIO.printMsg("There have been a problem with 'Thread.sleep' function.");

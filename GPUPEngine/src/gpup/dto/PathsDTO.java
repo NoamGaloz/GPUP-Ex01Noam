@@ -1,6 +1,6 @@
 package gpup.dto;
 
-import gpup.components.target.TargetsRelationType;
+import gpup.component.target.TargetsRelationType;
 
 import java.util.List;
 

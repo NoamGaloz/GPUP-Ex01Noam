@@ -1,4 +1,4 @@
-package gpup.components.target;
+package gpup.component.target;
 
 public enum TargetType {
     Independent,

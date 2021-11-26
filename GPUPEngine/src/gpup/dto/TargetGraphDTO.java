@@ -1,7 +1,7 @@
 package gpup.dto;
 
-import gpup.components.target.TargetType;
-import gpup.components.targetgraph.TargetGraph;
+import gpup.component.target.TargetType;
+import gpup.component.targetgraph.TargetGraph;
 
 public class TargetGraphDTO {
     private final int leaves;

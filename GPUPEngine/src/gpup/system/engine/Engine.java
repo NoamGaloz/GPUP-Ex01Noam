@@ -1,9 +1,9 @@
 package gpup.system.engine;
 
-import gpup.components.task.ProcessingStartStatus;
-import gpup.components.target.TargetsRelationType;
+import gpup.component.task.ProcessingType;
+import gpup.component.target.TargetsRelationType;
 import gpup.dto.*;
-import gpup.exceptions.TargetExistException;
+import gpup.exception.TargetExistException;
 import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,13 +16,13 @@ public interface Engine {
 
     TargetGraphDTO getGraphInfo();
 
-    boolean IsInitialized();
+    boolean isInitialized();
 
-    void InitTask(int targetProcessingTimeMs, int taskProcessingTimeType, float successProb, float successWithWarningsProb, ProcessingStartStatus status);
+    void initTask(int targetProcessingTimeMs, int taskProcessingTimeType, float successProb, float successWithWarningsProb, ProcessingType status);
 
-    void SetProcessingStartStatus(ProcessingStartStatus processingStartStatus);
+    void setProcessingType(ProcessingType processingStartStatus);
 
-    void RunTask(Consumer<ConsumerDTO> consumer) throws InterruptedException, IOException;
+    void runTask(Consumer<ConsumerDTO> consumer) throws InterruptedException, IOException;
 
     PathsDTO findPaths(String src, String dest, TargetsRelationType type);
 

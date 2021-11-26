@@ -1,9 +1,9 @@
 package gpup.dto;
 
-import gpup.components.target.FinishResult;
-import gpup.components.target.RunResult;
-import gpup.components.target.Target;
-import gpup.components.target.TargetType;
+import gpup.component.target.FinishResult;
+import gpup.component.target.RunResult;
+import gpup.component.target.Target;
+import gpup.component.target.TargetType;
 
 import java.util.ArrayList;
 import java.util.List;

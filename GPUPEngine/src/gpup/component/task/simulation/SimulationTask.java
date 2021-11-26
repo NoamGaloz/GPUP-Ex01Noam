@@ -1,8 +1,8 @@
-package gpup.components.task.simulation;
+package gpup.component.task.simulation;
 
 
-import gpup.components.target.FinishResult;
-import gpup.components.task.Task;
+import gpup.component.target.FinishResult;
+import gpup.component.task.Task;
 
 import java.util.Random;
 
@@ -23,7 +23,6 @@ public class SimulationTask implements Task {
         this.processingTimeType = processingTime;
         this.successProb = succesProb;
         this.successWithWarningsProb = ifSucces_withWarningsProb;
-        calcSingleTargetProcessingTimeInMs();
     }
 
     public FinishResult run() throws InterruptedException {
@@ -46,6 +45,11 @@ public class SimulationTask implements Task {
     @Override
     public void setDirectoryPath(String path) {
         dirPath = path;
+    }
+
+    @Override
+    public void updateProcessingTime(){
+        calcSingleTargetProcessingTimeInMs();
     }
 
     @Override

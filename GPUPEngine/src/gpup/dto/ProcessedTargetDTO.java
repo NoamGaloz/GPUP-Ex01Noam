@@ -1,7 +1,7 @@
 package gpup.dto;
 
-import gpup.components.target.FinishResult;
-import gpup.components.target.Target;
+import gpup.component.target.FinishResult;
+import gpup.component.target.Target;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class ProcessedTargetDTO implements ConsumerDTO {
         this.userData = target.getUserData() == null ? "No Data to show." : target.getUserData();
         this.finishResult = target.getFinishResult();
         justOpenedList = listToSting(target.getJustOpenedList());
-        justSkippedList = listToSting(target.GetSkippedList());
+        justSkippedList = listToSting(target.getSkippedList());
     }
 
     private String listToSting(List<Target> list) {

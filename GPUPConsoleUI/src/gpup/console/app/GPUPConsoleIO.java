@@ -118,10 +118,6 @@ public class GPUPConsoleIO {
         System.out.println("The GPUP System is not loaded yet, please load a Xml file first.");
     }
 
-    public static void showTargetInfo(TargetDTO targetDTO) {
-        System.out.println(targetDTO.toString());
-    }
-
     public static int getProcessingTime() {
         int processingTime;
         System.out.println("Please Enter The Task Processing Time (for single target) in ms : ");
@@ -169,7 +165,6 @@ public class GPUPConsoleIO {
         Scanner scanner = new Scanner(System.in);
         scanner.nextLine();
     }
-
 
     public static boolean isQuit(String name) {
         if (name.equals(UserInput.QUIT.toString())) {

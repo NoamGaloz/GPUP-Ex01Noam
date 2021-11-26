@@ -1,4 +1,4 @@
-package gpup.components.task.simulation;
+package gpup.component.task.simulation;
 
 public enum ProcessingTimeType {
     Random,

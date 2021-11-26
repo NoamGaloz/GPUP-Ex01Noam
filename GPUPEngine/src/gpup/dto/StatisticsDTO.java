@@ -1,6 +1,6 @@
 package gpup.dto;
 
-import gpup.components.target.FinishResult;
+import gpup.component.target.FinishResult;
 
 import java.time.Duration;
 import java.util.List;
@@ -21,7 +21,7 @@ public class StatisticsDTO implements ConsumerDTO{
             if(targetRunDTO.finishResult!=null) {
                 switch (targetRunDTO.finishResult) {
                     case SUCCESS:
-                        succesTargetsNum++;
+                        successTargetsNum++;
                         break;
                     case WARNING:
                         warningsTargetsNum++;
@@ -38,7 +38,7 @@ public class StatisticsDTO implements ConsumerDTO{
 
     private Duration totalRunDuration;
     private List<TargetRunDTO> targets;
-    private int succesTargetsNum = 0;
+    private int successTargetsNum = 0;
     private int warningsTargetsNum = 0;
     private int failureTargetsNum = 0;
     private int skippedTargetsNum = 0;
@@ -74,7 +74,7 @@ public class StatisticsDTO implements ConsumerDTO{
                 totalRunDuration.toMinutes(),
                 totalRunDuration.getSeconds()) +
                 "\n                STATISTICS                  "+
-                "\n SUCCES TARGETS........." + succesTargetsNum+
+                "\n SUCCES TARGETS........." + successTargetsNum +
                 "\n WARNING TARGETS........" + warningsTargetsNum+
                 "\n FAILURE TARGETS........" + failureTargetsNum+
                 "\n SKIPPED TARGETS........" + skippedTargetsNum+

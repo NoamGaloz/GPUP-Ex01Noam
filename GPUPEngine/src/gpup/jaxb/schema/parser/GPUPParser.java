@@ -1,16 +1,15 @@
 package gpup.jaxb.schema.parser;
 
-import gpup.components.target.Target;
-import gpup.components.target.TargetType;
-import gpup.components.targetgraph.TargetGraph;
-import gpup.exceptions.TargetExistException;
+import gpup.component.target.Target;
+import gpup.component.target.TargetType;
+import gpup.component.targetgraph.TargetGraph;
+import gpup.exception.TargetExistException;
 import gpup.jaxb.schema.generated.GPUPDescriptor;
 import gpup.jaxb.schema.generated.GPUPTarget;
 import gpup.jaxb.schema.generated.GPUPTargetDependencies;
 import gpup.jaxb.schema.generated.GPUPTargets;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -38,7 +37,7 @@ public abstract class GPUPParser {
         return target;
     }
 
-    private static Map<String, Target> parseTargetList(GPUPTargets gpupTargets) throws TargetExistException, NoSuchElementException {
+    private static Map<String, Target> parseTargetList(GPUPTargets gpupTargets) {
         Map<String, Target> targets = new HashMap<>();
 
         // creating a map of targets (no dependencies yet):

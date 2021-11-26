@@ -1,9 +1,9 @@
-package gpup.components.target;
+package gpup.component.target;
 
 public enum RunResult {
     FROZEN,
     SKIPPED,
     WAITING,
-    INPROCCESS,
+    INPROCESS,
     FINISHED
 }

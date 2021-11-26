@@ -1,7 +1,7 @@
-package gpup.components.targetgraph;
+package gpup.component.targetgraph;
 
-import gpup.components.target.Target;
-import gpup.components.target.TargetsRelationType;
+import gpup.component.target.Target;
+import gpup.component.target.TargetsRelationType;
 
 import java.util.List;
 import java.util.Map;

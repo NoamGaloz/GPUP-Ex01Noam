@@ -1,8 +1,7 @@
-package gpup.components.targetgraph;
+package gpup.component.targetgraph;
 
 import java.util.List;
 
-// לשנות שם?
 public interface DirectableGraph {
 
     void buildTransposeGraph();
