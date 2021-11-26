@@ -76,7 +76,8 @@ public class Target {
     }
 
     public boolean isAllAdjFinished() {
-        return dependsOnList.stream().allMatch(target -> target.getRunResult().equals(RunResult.FINISHED));
+        return dependsOnList.stream().allMatch(target -> (target.getRunResult().equals(RunResult.FINISHED)));
+        //||target.getRunResult().equals(RunResult.SKIPPED)));
     }
 
     public boolean isAllAdjFinishedWithoutFailure() {

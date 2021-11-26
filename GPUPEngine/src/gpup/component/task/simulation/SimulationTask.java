@@ -2,8 +2,12 @@ package gpup.component.task.simulation;
 
 
 import gpup.component.target.FinishResult;
+import gpup.component.target.Target;
 import gpup.component.task.Task;
+import gpup.dto.StatisticsDTO;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class SimulationTask implements Task {
@@ -15,6 +19,7 @@ public class SimulationTask implements Task {
     private String dirPath;
     private long sleepingTime;
     private Random random;
+    private List<Target> targets;
 
     public SimulationTask(String name, ProcessingTimeType processingTime, float succesProb, float ifSucces_withWarningsProb, int processingTimeInMs) {
         this.random = new Random();
@@ -69,5 +74,23 @@ public class SimulationTask implements Task {
             }
         }
         sleepingTime = res;
+    }
+
+    @Override
+    public void updateRelevantTargets(List<Target> targets){
+        this.targets=targets;
+    }
+
+    @Override
+    public List<StatisticsDTO.TargetRunDTO> getTargetsRunInfo(){
+
+        List<StatisticsDTO.TargetRunDTO> targetsRunInfoList = new ArrayList<>();
+
+        targets.forEach(((target) -> {
+            StatisticsDTO.TargetRunDTO targetRunDTO = new StatisticsDTO().new TargetRunDTO(target.getName(), target.getFinishResult(), target.getTaskRunDuration());
+            targetsRunInfoList.add(targetRunDTO);
+        }));
+
+        return targetsRunInfoList;
     }
 }

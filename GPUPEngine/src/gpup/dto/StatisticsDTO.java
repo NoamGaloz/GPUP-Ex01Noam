@@ -61,7 +61,7 @@ public class StatisticsDTO implements ConsumerDTO{
                     runTimeDuration.toHours(),
                     runTimeDuration.toMinutes(),
                     runTimeDuration.getSeconds());
-        return "    Target " + name + "\n "+ runResult+ "\n "+ runTime;
+        return "\n    Target " + name + "\n "+ runResult+ "\n "+ runTime;
         }
     }
 
@@ -78,7 +78,7 @@ public class StatisticsDTO implements ConsumerDTO{
                 "\n WARNING TARGETS........" + warningsTargetsNum+
                 "\n FAILURE TARGETS........" + failureTargetsNum+
                 "\n SKIPPED TARGETS........" + skippedTargetsNum+
-                "\n\n                 TARGETS                   "+"\n" ;
+                "\n\n                 TARGETS                   " ;
 
         for (TargetRunDTO targetRunDTO:targets) {
             res+=targetRunDTO.toString();

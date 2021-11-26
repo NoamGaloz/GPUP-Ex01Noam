@@ -78,6 +78,7 @@ public class GPUPEngine implements Engine {
     public void initTask(int targetProcessingTimeMs, int taskProcessingTimeType, float successProb, float successWithWarningsProb, ProcessingType status) {
         ProcessingTimeType procTimeType = taskProcessingTimeType == 1 ? ProcessingTimeType.Random : ProcessingTimeType.Permanent;
         task = new SimulationTask(targetGraph.getName(), procTimeType, successProb, successWithWarningsProb, targetProcessingTimeMs);
+        targetGraph.buildTransposeGraph();
     }
 
     @Override
@@ -90,8 +91,8 @@ public class GPUPEngine implements Engine {
         Instant totalStart, totalEnd, start, end;
         List<Target> waitingList;
 
-        targetGraph.prepareGraphFromProcType(processingType, processingType == ProcessingType.FromScratch);
-        targetGraph.buildTransposeGraph();
+        targetGraph.prepareGraphFromProcType(processingType);
+        task.updateRelevantTargets(targetGraph.getWaitingAndFrozen());
         targetGraph.clearJustOpenAndSkippedLists();
         waitingList = targetGraph.getAllWaitingTargets();
 
@@ -196,8 +197,6 @@ public class GPUPEngine implements Engine {
 
     private StatisticsDTO calcStatistics(Duration totalRunDuration) {
 
-        List<StatisticsDTO.TargetRunDTO> targetsRunInfoList = targetGraph.getTargetsRunInfoList();
-
-        return new StatisticsDTO(totalRunDuration, targetsRunInfoList);
+        return new StatisticsDTO(totalRunDuration, task.getTargetsRunInfo());
     }
 }

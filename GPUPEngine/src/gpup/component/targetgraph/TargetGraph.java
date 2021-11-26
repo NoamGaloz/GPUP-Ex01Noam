@@ -155,10 +155,12 @@ public class TargetGraph implements DirectableGraph, GraphActions {
 
     @Override
     public void buildTransposeGraph() {
-        gTranspose = new HashMap<>();
-        if (dependsOnGraph.size() != 0) {
-            targetMap.forEach(((s, target) -> gTranspose.put(s, new ArrayList<>())));
-            dependsOnGraph.forEach((s, targets) -> targets.forEach(target -> gTranspose.get(target.getName()).add(targetMap.get(s))));
+        if (gTranspose == null) {
+            gTranspose = new HashMap<>();
+            if (dependsOnGraph.size() != 0) {
+                targetMap.forEach(((s, target) -> gTranspose.put(s, new ArrayList<>())));
+                dependsOnGraph.forEach((s, targets) -> targets.forEach(target -> gTranspose.get(target.getName()).add(targetMap.get(s))));
+            }
         }
     }
 
@@ -194,6 +196,8 @@ public class TargetGraph implements DirectableGraph, GraphActions {
 
     public void updateTargetAdjAfterFinishWithoutFailure(List<Target> waitingList, Target currentTarget) {
         gTranspose.get(currentTarget.getName()).forEach(target -> {
+            if(target.isAllAdjFinished())
+                currentTarget.addToJustOpenedList(target);
             if (target.isAllAdjFinishedWithoutFailure()) {
                 target.setRunResult(RunResult.WAITING);
                 if (!waitingList.contains(target)) {
@@ -205,7 +209,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
 
     public void updateTargetAdjAfterFinishWithFailure(Target currentTarget) {
         gTranspose.get(currentTarget.getName()).forEach(target -> {
-            target.setRunResult(RunResult.SKIPPED);
+           // target.setRunResult(RunResult.SKIPPED);
             if (target.isAllAdjFinished()) {
                 currentTarget.addToJustOpenedList(target);
             }
@@ -219,6 +223,7 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         List<Target> skippedList = currentTarget.getSkippedList();
         recDfsUpdateSkippedList(isVisited, skippedList, currentTarget);
         skippedList.remove(currentTarget);
+        skippedList.forEach((target -> target.setRunResult(RunResult.SKIPPED)));
     }
 
     private void recDfsUpdateSkippedList(Map<Target, Boolean> isVisited, List<Target> skippedList, Target
@@ -253,33 +258,20 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         }));
     }
 
-    public void prepareGraphFromProcType(ProcessingType processingType, boolean isFirstRunTask) {
-        if (isFirstRunTask) {
-            updateLeavesAndIndependentsToWaiting();
-        } else {
-            if (processingType == ProcessingType.Incremental) {
-                updateTargetIncremental();
-            } else {
+    public void prepareGraphFromProcType(ProcessingType processingType) {
+        switch (processingType) {
+            case FromScratch:
                 updateTargetsFromScratch();
                 updateLeavesAndIndependentsToWaiting();
-            }
+                break;
+            case Incremental:
+                updateTargetIncremental();
+                break;
         }
     }
 
     public void clearJustOpenAndSkippedLists() {
         targetMap.forEach(((s, target) -> target.clearHelpingLists()));
-    }
-
-    public List<StatisticsDTO.TargetRunDTO> getTargetsRunInfoList() {
-
-        List<StatisticsDTO.TargetRunDTO> targetsRunInfoList = new ArrayList<>();
-
-        targetMap.forEach(((s, target) -> {
-            StatisticsDTO.TargetRunDTO targetRunDTO = new StatisticsDTO().new TargetRunDTO(s, target.getFinishResult(), target.getTaskRunDuration());
-            targetsRunInfoList.add(targetRunDTO);
-        }));
-
-        return targetsRunInfoList;
     }
 
     private Boolean recDfsFindCircuitWithGivenTarget(Map<Target, Boolean> isVisited, List<String> circuitList, Target currentTarget,Target src,Boolean foundCirc) {
@@ -297,6 +289,17 @@ public class TargetGraph implements DirectableGraph, GraphActions {
         }
         circuitList.remove(currentTarget.getName());
         return false;
+    }
+
+    public List<Target> getWaitingAndFrozen() {
+        List<Target> waitingFrozen =new ArrayList<>();
+        targetMap.forEach(((s, target) -> {
+            if (target.getRunResult().equals(RunResult.WAITING)||target.getRunResult().equals(RunResult.FROZEN) ) {
+                waitingFrozen.add(target);
+            }
+        }));
+
+        return waitingFrozen;
     }
 }
 
